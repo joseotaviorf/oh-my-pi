@@ -1,0 +1,98 @@
+database_name: dw_bpo_performance_staging
+table_name: fcr_metric
+description: First Contact Resolution (FCR) complement data for BPO analysis, linking ticket recontact patterns to agent and taxonomy dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Ticket opening date
+  last_team: 
+    lineage: 
+      - dw_customer_support.dim_department.team
+    description: Returns the last area belonging to the ticket.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+    description: Communication channel of the contact (call or chat).
+  last_agent_organization:
+    lineage: 
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the organization of the analyst of the last analyst assigned to the ticket.
+  flag_back: 
+    lineage: 
+      - dw_customer_support.fact_tickets.front_or_back
+    description: Indicates whether the ticket belongs to the Back.
+  theme_recontact_flag:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates whether the customer from that ticket returned within 4 days to discuss the same issue.
+  is_pp_multi:
+    lineage:
+      - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
+    description: Indicates whether the ticket owner is a PP Multi.
+  first_resolution_last_agent:
+    lineage: 
+     - dw_customer_support.fact_tickets.ts_solved
+    description: Returns the date of the first resolution by the analyst associated with the ticket. 
+  sk_session_and_ticket:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.sk_ticket
+     - dw_customer_support.fact_customer_contacts.sk_support_session
+    description: Call or chat identifier ID; here, we are looking at both the `sk_ticket` (from when Zendesk was used) and the new `sk_support_session` field.
+  sk_user:
+    lineage: 
+     - dw_customer_support.fact_tickets.sk_user
+     - dw_customer_support.fact_customer_contacts.sk_user
+    description: User identifier associated with the contact.
+  front_or_back:
+    lineage: 
+     - dw_customer_support.dim_department
+    description: Indicates whether the Case belongs to the Front or Back.
+  origin_fcc:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.origin
+    description: Communication origin channel of the contact, indicating whether it came through the in-app chat interface ('in_app') or WhatsApp ('whatsapp').
+  direction:
+    lineage: 
+     - dw_customer_support.fact_customer_contacts.origin
+    description: Communication origin channel of the contact, indicating whether it came through the in-app chat interface ('in_app') or WhatsApp ('whatsapp').   
+  last_agent_email:
+    lineage: 
+     - dw_customer_support.dim_analyst.email
+    description: Returns the last analyst assigned to the case.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns the last department/queue associated with the ticket. 
+  theme_recontact_flag_per_bpo:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates whether the customer from that ticket returned within 4 days to discuss the same issue per bpo.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

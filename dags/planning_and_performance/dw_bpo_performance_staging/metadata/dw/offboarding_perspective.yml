@@ -1,0 +1,193 @@
+database_name: dw_bpo_performance_staging
+table_name: offboarding_perspective
+description: Offboarding perspective for BPO performance reporting — lifecycle dates, stages, leadtimes and flags derived from `dw_offboarding.obt_offboarding` joined with inspection, repair and owner data. Partitioned by year, month and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: diego.carvalho@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - dw_offboarding.obt_offboarding.sk_contract
+    description: Surrogate key of the contract (id_contract) used to join offboarding information.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Work email of the agent (SPOC) associated to the contract, taken from the rollout logic.
+  wip_stage:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Current workflow stage of the offboarding process (e.g. TF, mediation, inspection, pre_saida, etc.).
+  ts_termination_request:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_termination_request
+    description: Timestamp when termination was requested for the contract.
+  dt_termination:
+    lineage:
+      - dw_offboarding.obt_offboarding.dt_termination
+    description: Date of the contract termination.
+  dt_inspected:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_inspected
+    description: Date when the exit inspection occurred.
+  is_exit_inspection_opt_out:
+    lineage:
+      - dw_offboarding.obt_offboarding.is_exit_inspection_opt_out
+    description: Whether the contract opted out of exit inspection.
+  dt_repair_analysis_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_repair_analysis
+    description: Date when repair analysis started.
+  dt_repair_analysis_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_owner_review
+    description: Date when repair analysis finished.
+  dt_owner_engagement_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_owner_review
+    description: Date when owner engagement started.
+  dt_tenant_engagement_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_tenant_review
+    description: Date when tenant engagement started.
+  dt_owner_engagement_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_tenant_review
+    description: Date when owner engagement finished.
+  dt_tenant_engagement_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_contestation_analysis
+      - dw_offboarding.obt_offboarding.ts_reviewed
+    description: Date when tenant engagement finished (review or contestation timestamp).
+  dt_contestation_analysis_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_sent_to_contestation_analysis
+    description: Date when contestation analysis started.
+  dt_contestation_analysis_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_contestation_analysis_finished
+    description: Date when contestation analysis finished.
+  dt_owner_budget_approval_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_budget_approval_sent_to_owner
+    description: Date when owner budget approval process started.
+  dt_tenant_budget_approval_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_budget_approval_sent_to_tenant
+    description: Date when tenant budget approval process started.
+  dt_owner_budget_approval_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_budget_approval_sent_to_tenant
+    description: Date when owner budget approval finished (mirrors tenant flow in this query).
+  dt_tenant_budget_approval_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_reviewed
+    description: Date when tenant budget approval finished (review timestamp).
+  dt_budget_approval_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_reviewed
+    description: Date when any budget approval flow finished.
+  dt_mediation_started:
+    lineage:
+      - dw_offboarding.obt_offboarding.dt_mediation_started
+    description: Date when mediation started for the contract.
+  dt_termination_finished:
+    lineage:
+      - dw_offboarding.obt_offboarding.ts_termination_finished
+    description: Date when the termination process finished.
+  is_spoc_test_group_contract:
+    lineage:
+      - dw_offboarding.obt_offboarding.is_spoc_test_group_contract
+    description: Flag indicating if the contract is part of the SPOC test group.
+  termination_status:
+    lineage:
+      - dw_offboarding.obt_offboarding.termination_status
+    description: Termination status string (e.g. ended, CANCELED).
+  final_tenant_inspection_cost:
+    lineage:
+      - dw_offboarding.obt_offboarding.final_tenant_inspection_cost
+    description: Final inspection cost charged to tenant.
+  is_early_both_agree:
+    lineage:
+      - dw_offboarding.obt_offboarding.has_early_agreement
+    description: Whether both parties agreed early to an outcome.
+  has_repairs:
+    lineage:
+      - dw_offboarding.obt_offboarding.has_repairs
+    description: Whether repairs were registered for the contract.
+  has_agreement:
+    lineage:
+      - dw_offboarding.obt_offboarding.has_agreement
+    description: Whether an agreement was reached.
+  has_automatic_bandaid:
+    lineage:
+      - dw_offboarding.obt_offboarding.model_discount_type
+    description: Indicates automatic bandaid model applied (true when model_discount_type = 'AUTOMATIC_BANDAID').
+  is_pp_multi:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history
+      - dw_rent.fact_listing_rent_flows
+    description: Whether the owner was considered PP Multi at the time of the offboarding.
+  leadtime_total:
+    lineage:
+      - dw_offboarding.obt_offboarding.leadtime_total
+    description: Total leadtime (days) measured by the offboarding pipeline.
+  review_response_status:
+    lineage:
+      - dw_inspections.fact_report_inspections
+      - repair_request
+    description: Consolidated review response status from inspection and repair review adjustments.
+  budget_approval_response_status:
+    lineage:
+      - dw_inspections.fact_report_inspections
+    description: Consolidated budget approval response status computed from inspection/report fields.
+  leadtime_inspection:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days between termination and inspection (null when opted-out).
+  leadtime_repair_analysis:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent in repair analysis.
+  leadtime_owner_engagement:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent in owner engagement.
+  leadtime_tenant_engagement:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent in tenant engagement.
+  leadtime_contestation_analysis:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent in contestation analysis.
+  leadtime_owner_budget_approval:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent waiting for owner budget approval.
+  leadtime_tenant_budget_approval:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent waiting for tenant budget approval.
+  leadtime_mediation:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Days spent in mediation until termination finished.
+  aging:
+    lineage:
+      - dw_offboarding.obt_offboarding
+    description: Aging in days for open terminations (current_date - request date when not finished).
+  year:
+    lineage:
+      - current_date
+    description: Current year partition.
+  month:
+    lineage:
+      - current_date
+    description: Current month partition.
+  day:
+    lineage:
+      - current_date
+    description: Current day partition.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this metric row was loaded into the data warehouse.

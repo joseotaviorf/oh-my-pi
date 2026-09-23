@@ -1,0 +1,167 @@
+database_name: dw_bpo_performance_staging
+table_name: tickets_transferred
+description: Support tickets transferred between departments for BPO performance monitoring, tracking origin, destination team, and agent assignment. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  sk_segment:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Surrogate key for the segment, cast from Twilio id_task.
+  front_or_back:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: Indicates whether the service refers to front or back office.
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Communication channel of the contact (call or chat).
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Name of the support department that received the transferred ticket.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Support team within the destination department that owns the transferred ticket.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: BPO vendor organization of the agent who handled the transferred ticket.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Work email of the support agent assigned to the transferred ticket.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme taxonomy of a ticket.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail taxonomy of a ticket.
+  first_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: First department of a ticket.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Last department of a ticket.
+  transferred_to:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department to which the ticket was transferred.
+  is_last_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+    description: Whether the last interaction of the ticket was with a human agent.
+  is_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_contact_answered
+    description: Indicates if the contact was answered.
+  ticket_origin:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.origin
+    description: Source department or workflow from which the ticket was transferred.
+  task_transferred:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
+      - dw_customer_support.dim_department.team
+    description: Whether the task was transferred to a non-Inside Sales department.
+  task_idled:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Whether the task was idled by the agent.
+  session_expired:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Whether the task was expired by the agent.
+  status:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Current workflow status of the transferred ticket after the handoff.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp when the task was started.
+  sk_contact:
+    lineage:
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.calls.id_task
+      - datalake_customer_support.chats.id_session
+      - datalake_customer_support.chats.id_task
+    description: Received Contact Identifier
+  sk_interaction:
+    lineage:
+      - datalake_customer_support.calls.direction
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.calls.id_task
+      - datalake_customer_support.calls.id_reservation
+      - datalake_customer_support.chats.direction
+      - datalake_customer_support.chats.id_session
+      - datalake_customer_support.chats.id_task
+    description: Interaction identifier for a contact in the Chat or Call.
+  area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: It indicates the area responsible for that interaction.
+  is_first_department_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
+    description: Indicates which department/queue the first interaction occurred in.
+  transferred_to_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Indicates the team to which the transfer was made.
+  first_response_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.first_reply_time
+    description: Time in seconds it took for the first response to occur.
+  is_interaction_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_interaction_answered
+    description: Indicates whether an interaction was completed.
+  pre_and_post_contract:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: The identification for the contact refers to whether it is a pre-contract or post-contract matter.
+  is_in_sla:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+      - dw_customer_support.fact_customer_contacts.first_reply_time
+    description: Indicates whether the service was fulfilled within the specified SLA.
+  is_ticket_chat:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Indicates whether the service was provided via chat.
+  is_call_abandoned:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+      - dw_customer_support.fact_customer_contacts.is_contact_answered
+    description: Indicates whether the call was abandoned.
+  transfer_reason:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Reason for the transfer, either human error or bot error.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

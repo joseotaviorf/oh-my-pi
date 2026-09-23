@@ -1,0 +1,156 @@
+database_name: dw_bpo_performance_staging
+table_name: recontact
+description: Customer recontact events for BPO performance analysis, measuring repeat contacts within a defined window and handling time between consecutive interactions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key of the Zendesk ticket id.
+  sk_ticket_first_contact:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+    description: Surrogate key of the Zendesk ticket id of the previous contact.
+  sk_ticket_contact_later:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.fact_tickets.ts_created
+    description: Surrogate key of the Zendesk ticket id of the next contact.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+    description: Surrogate key of the Zendesk user id.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.fact_tickets.sk_user
+    description: Support channel through which the recontact interaction occurred (e.g. email, chat, phone).
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team of the analyst who answered the ticket.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department of the analyst who answered the ticket.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the analyst who answered the ticket.
+  email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the analyst who answered the ticket.
+  macrotaxo_first_contact:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.fact_tickets.sk_user
+    description: Macrotaxonomy of the first contact.
+  macrotaxo_last_contact:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.fact_tickets.sk_user
+    description: Macrotaxonomy of the last contact.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Detail of the theme of the last contact.
+  email_first_contact:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.fact_tickets.sk_user
+    description: Work email of the agent who handled the customer's initial contact before the recontact event.
+  total_minutes_handling_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_handling_time
+    description: Total handling time of the contact in minutes.
+  total_minutes_handling_time_previous_contact:
+    lineage:
+      - dw_customer_support.fact_customer_contats.ts_started
+      - dw_customer_support.fact_customer_contats.sk_user
+      - dw_customer_support.fact_customer_contacts.total_handling_time
+    description: Total agent handling time in minutes for the customer's previous contact before the recontact occurred.
+  total_minutes_queue_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.total_waiting_time
+    description: Total queue time of the contact in minutes.
+  csat_first_contact:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_score
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.fact_tickets.sk_user
+    description: CSAT score of the first contact.
+  csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.last_csat_score
+    description: CSAT score of the last contact.
+  ticket_back:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+      - dw_customer_support.fact_tickets.ts_started
+      - dw_customer_support.fact_tickets.ts_solved
+    description: If the ticked is created between the start and solved timestamp, or is not solved, it is included in the ticket_back array.
+  recontact_flag:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+    description: Indicates if the contact is a recontact.
+  recontact_flag_taxo:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates if the contact is a recontact by taxonomy.
+  search_window_from:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Search window from of the ticket minus 3 days.
+  search_window_until:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Search window until of the ticket created date.
+  refined_direction:
+    lineage:
+      - dw_customer_support.fact_tickets.ticket_origin
+      - dw_customer_support.fact_tickets.direction
+    description: Type of Service and if it's inbound or outbound.
+  ts_started_first_contact:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+    description: Timestamp of the start of the first contact.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_started
+    description: Timestamp of the start of the ticket.
+  year:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_started
+    description: Year of the ticket.
+  month:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_started
+    description: Month of the ticket.
+  day:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_started
+    description: Day of the ticket.
+  ts_load:
+    lineage:
+      - CURRENT_TIMESTAMP
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

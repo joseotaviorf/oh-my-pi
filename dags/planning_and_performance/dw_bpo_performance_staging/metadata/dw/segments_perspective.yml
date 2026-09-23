@@ -1,0 +1,373 @@
+database_name: dw_bpo_performance_staging
+table_name: segments_perspective
+description: Twilio segment contact records with applied routing rules for BPO performance reporting, including handling time and agent organization context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: diego.carvalho@quintoandar.com.br
+columns:
+  sk_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_interaction
+    description: Interaction identifier for a contact in the chat or call.
+  sk_contact:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_contact
+    description: Contact identifier associated with the interaction.
+  sk_call:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_call
+    description: Call identifier associated with the interaction.
+  sk_session:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_session
+    description: Session identifier associated with the contact.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Task identifier associated with the contact.
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Ticket identifier associated with the contact.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_user
+    description: User identifier associated with the contact.
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Communication channel of the contact (call or chat).
+  refined_direction:
+    lineage:
+      - "'INBOUND'"
+    description: Direction normalized as inbound for this perspective.
+  customer_phone:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.customer_phone_number
+    description: Customer phone number associated with the contact.
+  customer_email:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.customer_email
+    description: Customer email associated with the contact.
+  origin_fcc:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.origin
+    description: Origin of the contact in the customer support fact.
+  ticket_origin:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.origin
+    description: Origin used for the ticket creation path.
+  origin_ft:
+    lineage:
+      - "''"
+    description: Placeholder for the original ticket-origin field.
+  is_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_contact_answered
+    description: Indicates whether the contact was answered.
+  is_interaction_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_interaction_answered
+    description: Indicates whether the interaction was answered.
+  is_first_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_first_interaction
+    description: Indicates whether this interaction is the first in the contact sequence.
+  is_last_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+    description: Indicates whether this interaction is the last one in the contact sequence.
+  is_first_department_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
+    description: Indicates whether this was the first interaction in the assigned department.
+  per_team_flag:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_per_team_task
+    description: Flag that corresponds to the by-team field in the contact event.
+  status:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Status of the interaction in the customer support lifecycle.
+  ts_reservation_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_reservation_created
+    description: Timestamp indicating when the reservation was created.
+  average_reply_time:
+    lineage:
+      - "NULL"
+    description: Average reply time for that contact.
+  queue_time:
+    lineage:
+      - datalake_customer_support.calls.ts_reservation_accepted
+      - datalake_customer_support.calls.ts_reservation_created
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description: Waiting time in seconds in the queue.
+  talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+      - dw_customer_support.fact_customer_contacts.total_talk_time
+    description: Time in seconds of spoken time in the interaction.
+  handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
+      - dw_customer_support.fact_customer_contacts.total_handling_time
+    description: Total handling time in seconds for the interaction.
+  first_response_time:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.first_reply_time
+    description: Time in seconds it took for the first response to occur.
+  quinto_andar_phone_number:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.quinto_andar_phone_number
+    description: Phone number the customer used for the contact.
+  has_ticket_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Indicates whether a ticket was created for that contact.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department or queue associated with the interaction.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team associated with the interaction.
+  area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Area responsible for the interaction.
+  front_or_back:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: Indicates whether the service refers to front or back office.
+  is_partner:
+    lineage:
+      - dw_customer_support.dim_department.is_partner
+    description: Indicates whether the department belongs to a 5A partner.
+  journey_step:
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+    description: Stage of the contact journey.
+  customer_type:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type tag related to the contact.
+  motivation:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation classification related to the contact.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+      - dw_support_journey.fact_services.theme
+    description: Theme classification associated with the contact.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+      - dw_support_journey.fact_services.theme_detail
+    description: Detailed theme classification associated with the contact.
+  journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: Journey linked to the contact.
+  sub_journey:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: Sub-journey linked to the contact.
+  line_owner:
+    lineage:
+      - dw_customer_support.dim_taxonomy.line_owner
+    description: Macro area responsible for the contact.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email from the agent related to that interaction.
+  agent_manager:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_manager
+    description: Manager of the agent linked to the interaction.
+  agent_full_name:
+    lineage:
+      - dw_customer_support.dim_analyst.full_name
+    description: Full name of the agent linked to the interaction.
+  agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: BPO vendor organization to which the agent belongs.
+  agent_dt_start:
+    lineage:
+      - dw_customer_support.dim_analyst.dt_agent_start
+    description: Agent registration start date.
+  first_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email address of the first agent related to that contact.
+  last_agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email address of the last agent related to that contact.
+  last_agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the last agent associated with the contact.
+  interaction_number:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_contact
+      - dw_customer_support.fact_customer_contacts.ts_reservation_created
+    description: Sequential number of the interaction for that contact.
+  front_pre_pos:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Indicates whether the department belongs to the pre or post journey.
+  tags:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Tags entered in the ticket related to the contact.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Last department related to the contact ticket.
+  last_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Last team related to the contact ticket.
+  last_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Last area related to the contact team.
+  first_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: First department related to the contact ticket.
+  first_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: First team related to the contact ticket.
+  first_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: First area related to the contact ticket.
+  transferred_from:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department from which the transfer was made.
+  transferred_from_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team from which the transfer was made.
+  transferred_to:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department to which the transfer was made.
+  transferred_to_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team to which the transfer was made.
+  next_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Area of the next department associated with the contact.
+  ts_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp indicating when the task was created.
+  dt_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Date derived from the task creation timestamp.
+  first_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+    description: Initial customer satisfaction score recorded for the ticket.
+  first_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_comment
+      - dw_satisfaction_rating.dim_answer.respondent_comments
+    description: Initial comment in the customer satisfaction survey recorded for the ticket.
+  response_date:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.ts_first_response
+      - dw_satisfaction_rating.fact_answer.ts_submitted
+    description: Date on which the satisfaction survey related to the contact ticket was answered.
+  resolution_survey:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.is_solved
+      - dw_satisfaction_rating.fact_answer.is_solved
+    description: Indicates whether the ticket was resolved or solved through the satisfaction survey.
+  is_spoc_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_spoc_task
+    description: Indicates whether the task was initiated by SPOC.
+  direction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.direction
+    description: Direction associated with the SPOC task.
+  session_source:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.custom_fields
+    description: Platform on which the contact was made.
+  sk_analyst:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_analyst
+    description: Analyst identification ID.
+  step_name:
+    lineage:
+      - dw_customer_support.fact_ivr_interactions.step_name
+    description: Name of the stage in the interaction process.
+  type_call:
+    lineage:
+      - dw_customer_support.fact_ivr_interactions.type
+    description: Classification of the interaction type.
+  bot:
+    lineage:
+      - datalake_chatbot.sessions.bot
+    description: Bot classification associated with the interaction.
+  group_name:
+    lineage:
+      - dw_customer_support.dim_ticket.group_name
+    description: Group name associated with the ticket.
+  company_name:
+    description: Company name resolved from the customer contact. Always NULL today — no source is currently joined for this column.
+  transfer_reason:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.dim_department.department
+    description: Classifies the reason for the transfer.
+  transfer_reason_teste:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.dim_department.department
+    description: Additional transfer-reason classification used in testing.
+  transfer_reason_detailed:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+      - dw_customer_support.dim_department.department
+      - dw_customer_support.fact_customer_contacts.status
+    description: Detailed explanation of the reason for the transfer.
+  first_resolution_analyst:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_reservation_ended
+    description: Date of the first ticket resolution by the analyst.
+  queue_time_10k_sec:
+    lineage:
+      - datalake_customer_support.calls.ts_reservation_accepted
+      - datalake_customer_support.calls.ts_reservation_created
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description: Flag indicating whether queue time is greater than 10,000 seconds.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

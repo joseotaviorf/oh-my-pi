@@ -1,0 +1,132 @@
+database_name: dw_bpo_performance_staging
+table_name: backlog_metric
+description: Daily backlog snapshot of open customer support tickets for BPO performance monitoring, including SLA compliance, agent assignment, and taxonomy dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  sk_agent:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.sk_agent
+    description: Surrogate key for the agent, cast from agent_email.
+  channel:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.channel
+    description: Support channel through which the backlog ticket was opened (e.g. email, chat, phone).
+  status:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.status
+    description: Current workflow status of the backlog ticket (e.g. open, pending, solved).
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.organization
+    description: Organization of the agent.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_email
+    description: Work email of the support agent assigned to the backlog ticket.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department of the ticket.
+  front_or_back:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: If ticket is from front or back.
+  contact_motivation_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation of the ticket.
+  contact_theme_detail_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail of the ticket.
+  customer_type_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type of the ticket.
+  tag:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Tags of the ticket.
+  step_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.step_tag
+    description: Taxonomy step tag classifying the customer journey stage of the backlog ticket.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Support team responsible for handling the backlog ticket.
+  journey_step:
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+    description: Journey step of the ticket.
+  area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Business area within customer support that owns the backlog ticket.
+  sla_target:
+    lineage:
+      - dw_customer_support.fact_tickets.sla_target
+    description: SLA target of the ticket.
+  days_worked:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.days_worked
+    description: Number of days worked on the ticket.
+  days_worked_with_days_offs:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.days_worked_with_days_offs
+    description: Number of days worked on the ticket with days off.
+  days_off:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.days_off
+    description: Number of days off related to the ticket processing.
+  is_daily_backlog:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.is_daily_backlog
+    description: Boolean value indicating if the ticket is a daily backlog.
+  is_backlog_in_time:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.days_worked
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Boolean value indicating if the ticket is in time according to the SLA target.
+  is_backlog_not_in_time:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.days_worked
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Boolean value indicating if the ticket is not in time according to the SLA target.
+  dt_metric_reference:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.dt_metric_reference
+    description: Date of the metric reference. 
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.ts_started
+    description: Timestamp of the start of the ticket processing.
+  ts_solved:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.ts_solved
+    description: Timestamp of the solution of the ticket.
+  replies:
+    lineage:
+      - dw_customer_support.fact_tickets.replies
+    description: Number of replies to the ticket.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date 
+    description: Current day.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

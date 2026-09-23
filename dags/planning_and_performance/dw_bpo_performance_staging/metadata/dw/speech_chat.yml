@@ -1,0 +1,54 @@
+database_name: dw_bpo_performance_staging
+table_name: speech_chat
+description: Speech analytics chat message records for BPO performance monitoring, linking chat content to support ticket and agent context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_customer_support.chats.id_ticket
+    description: Identification key of the service ticket related to speech chat.
+  organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Organization of the agent who answered the chat.
+  country_code:
+    lineage:
+      - 'BR'
+    description: Country code of the agent who answered the chat.
+  ts_ticket_started:
+    lineage:
+      - datalake_customer_support.chats.ts_created
+    description: Timestamp of the start of the ticket.
+  ts_ticket_ended:
+    lineage:
+      - datalake_customer_support.chats.ts_ended
+    description: Timestamp of the end of the ticket.
+  ts_created_message:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+    description: Timestamp of the creation of the message.
+  message:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.message_body
+    description: Full text content of the chat message captured by speech analytics for BPO review.
+  message_from:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.from_phone_number
+    description: Phone number of the sender of the message.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

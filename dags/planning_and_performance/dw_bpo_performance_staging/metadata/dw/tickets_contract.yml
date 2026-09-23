@@ -1,0 +1,103 @@
+database_name: dw_bpo_performance_staging
+table_name: tickets_contract
+description: Rental contracts linked to Zendesk support tickets for BPO performance reporting and contract-level ticket analysis. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Support and Services
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.sk_task
+    description: Task identifier associated with the contact.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns the department Zendesk to the ticket.
+  analyst_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Returns the analyst Zendesk to the ticket.
+  agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the analyst's organization to the ticket.
+  contract_identification_rule:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+      - dw_rent.fact_house_listings.sk_contract
+      - dw_customer_support.fact_tickets.sk_contract
+      - dw_rent.fact_contract_people.sk_contract
+    description: Rule for identifying the contract number.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+    description: User identifier associated with the contact.
+  user_type:
+    lineage:
+      - dw_rent.fact_contract_people.contract_role
+    description: Returns the type of customer associated the ticket.
+  ticket_status:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.status
+    description: Ticket status (Ex. Solved, Open...)
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Detailed taxonomy related to contact
+  status:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.dt_metric_reference
+    description: Defines the ticket's backlog status.
+  context_identifier:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
+      - dw_customer_support.dim_department.department
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Define the ticket journey through the department and the taxonomy associated with it.
+  origin_identifier:
+    lineage:
+      - dw_customer_support.dim_ticket.custom_fields
+      - dw_rent.fact_house_listings.sk_contract
+      - dw_customer_support.fact_tickets.sk_contract
+      - dw_rent.fact_contract_people.sk_contract
+    description: Indicates the original contract for the ticket.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.ts_started
+    description: Ticket opening date
+  min_ts_started:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.ts_started
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.department
+    description: Indicates the first open ticket for the contract and the user for portfolio allocation.
+  flag:
+    lineage:
+      - dw_customer_support.fact_backlog_metrics_tasks.ts_started
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.department
+      - dw_customer_support.dim_ticket.custom_fields
+      - dw_rent.fact_house_listings.sk_contract
+      - dw_customer_support.fact_tickets.sk_contract
+      - dw_rent.fact_contract_people.sk_contract
+    description: Indicates whether the ticket is eligible for bookleting.
+  tickets_user:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.department
+    description: User ticket volume in the department
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

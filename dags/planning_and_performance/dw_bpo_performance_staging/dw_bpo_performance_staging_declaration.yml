@@ -1,0 +1,230 @@
+dag:
+  name: dw_bpo_performance_staging
+  schedule_start_date: 2026, 9, 23
+  owner: Data Planning and Performance
+  documentation:
+    dag_purpose: |
+      EMR (Spark 3.5) port of `dw_bpo_performance`, limited to the 20 tables exported by
+      `reverse_aec`, `reverse_atento` and `reverse_concentrix`. Writes to
+      `dw_bpo_performance_staging` and runs alongside the Databricks DAG until the reverse DAGs
+      are repointed here.
+    additional_information: |
+      ### Relationship with `dw_bpo_performance`
+
+      The SQL is the same as `dw_bpo_performance`, with the Databricks-only constructs
+      (`QUALIFY`, `GROUP BY ALL`, unit-first `DATEDIFF` / `DATE_ADD` / `DATE_DIFF`, the `OR`
+      join on `dim_analyst`) rewritten to run on EMR Spark 3.5, and
+      `cases_perspective.minutes_first_reply_time_business` cast to `DOUBLE` to keep the type of
+      the existing Delta column. Any logic change made to one of these 20 tables in
+      `dw_bpo_performance` must be mirrored here while both DAGs run.
+
+      `fcr_metric` reads `cases_perspective` from this DAG's schema
+      (`dw_bpo_performance_staging.cases_perspective`). `cases_perspective` still reads the frozen
+      history of `dw_bpo_performance.tickets_perspective`, which is no longer produced.
+
+      ### All-time backfill (table reset)
+
+      The four `incremental` tables (`cases_perspective`, `segments_perspective`,
+      `satisfaction_salesforce`, `customer_contacts_session`) load through a Delta MERGE that
+      only upserts — it never deletes. Rows written by a bad run, or rows that no longer exist
+      in the source, stay in the target forever.
+
+      `backfill_tables` reprocesses the named tables over their full history and replaces their
+      contents in a **single Delta transaction**: the same MERGE that upserts the all-time
+      result set also carries `whenNotMatchedBySourceDelete`, so readers never observe the
+      table empty or partially loaded.
+
+      ```json
+      {
+        "run_type": "test_run",
+        "backfill_tables": ["segments_perspective"]
+      }
+      ```
+
+      - `backfill_tables` (list) — the tables to reset. This is the only control: naming a
+        table backfills it, and anything else (omitted, `[]`, `null`) leaves every table on
+        its normal daily window. There is deliberately no "reset everything" shorthand — to
+        reset more than one table, name each one.
+      - `backfill_floor_date` / `backfill_ceiling_date` (optional) — override the all-time
+        window, defaults `1970-01-01` and `2999-12-31`. The ceiling is not `9999-12-31`
+        because the SQL does date arithmetic on it (e.g. `DATE_ADD(DATE('{load_end_date}'), 20)`
+        in `customer_contacts_session.sql`), which would leave Spark's date range.
+
+      Operational notes:
+
+      - **Only the four `incremental` tables above can be reset.** The 16 `full` tables already
+        do a full atomic table overwrite on every run, so they self-heal without a flag, and
+        naming one here does nothing.
+      - **Reset one table per run.** An all-time MERGE rewrites the whole table and is far more
+        expensive than a daily merge. These four tables carry `execution_timeout_hours: 6`
+        for that reason.
+      - **A misspelled table name silently does nothing.** The selection is a Jinja membership
+        test, not a validated enum, so the run succeeds having reset nothing.
+      - Partition columns come from `CURRENT_DATE` (every query ends with
+        `YEAR(CURRENT_DATE) AS year, ...`), so a backfill lands all history in today's
+        partition — same as the daily run does.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: bpo_performance_staging
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  tables_customization:
+    cases_perspective:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [case_number, Platform]
+      z_order_by: [case_number]
+      execution_timeout_hours: 6
+      extra_query_template_params:
+        load_start_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'cases_perspective' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_floor_date', '1970-01-01') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}
+          {%- endif -%}
+        load_end_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'cases_perspective' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_ceiling_date', '2999-12-31') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}
+          {%- endif -%}
+      when_not_matched_by_source_delete_condition: >-
+        {%- set requested = (dag_run.conf or {}).get('backfill_tables') or [] -%}
+        {%- if 'cases_perspective' in (requested if requested is not string else [requested]) -%}
+        TRUE
+        {%- endif -%}
+    backlog_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    csat_front:
+      partitions: [year, month, day]
+      extraction_type: full
+    demand_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    fcr_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    email:
+      partitions: [year, month, day]
+      extraction_type: full
+    general_metric:
+      partitions: [year, month, day]
+      extraction_type: full
+    recontact:
+      partitions: [year, month, day]
+      extraction_type: full
+    segments_perspective:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_interaction]
+      execution_timeout_hours: 6
+      extra_query_template_params:
+        load_start_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'segments_perspective' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_floor_date', '1970-01-01') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}
+          {%- endif -%}
+        load_end_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'segments_perspective' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_ceiling_date', '2999-12-31') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}
+          {%- endif -%}
+      when_not_matched_by_source_delete_condition: >-
+        {%- set requested = (dag_run.conf or {}).get('backfill_tables') or [] -%}
+        {%- if 'segments_perspective' in (requested if requested is not string else [requested]) -%}
+        TRUE
+        {%- endif -%}
+    speech_call:
+      partitions: [year, month, day]
+      extraction_type: full
+    speech_chat:
+      partitions: [year, month, day]
+      extraction_type: full
+    taxonomy:
+      partitions: [year, month, day]
+      extraction_type: full
+    tickets_contract:
+      partitions: [year, month, day]
+      extraction_type: full
+    tickets_transferred:
+      partitions: [year, month, day]
+      extraction_type: full
+    tmr:
+      partitions: [year, month, day]
+      extraction_type: full
+    twilio_chat_aht:
+      partitions: [year, month, day]
+      extraction_type: full
+    offboarding_perspective:
+      partitions: [year, month, day]
+      extraction_type: full
+    satisfaction_salesforce:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_answer_csat]
+      z_order_by: [sk_answer_csat]
+      execution_timeout_hours: 6
+      extra_query_template_params:
+        load_start_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'satisfaction_salesforce' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_floor_date', '1970-01-01') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}
+          {%- endif -%}
+        load_end_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'satisfaction_salesforce' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_ceiling_date', '2999-12-31') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}
+          {%- endif -%}
+      when_not_matched_by_source_delete_condition: >-
+        {%- set requested = (dag_run.conf or {}).get('backfill_tables') or [] -%}
+        {%- if 'satisfaction_salesforce' in (requested if requested is not string else [requested]) -%}
+        TRUE
+        {%- endif -%}
+    customer_contacts_session:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_support_session_fallback_ticket]
+      execution_timeout_hours: 6
+      extra_query_template_params:
+        load_start_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'customer_contacts_session' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_floor_date', '1970-01-01') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}
+          {%- endif -%}
+        load_end_date: >-
+          {%- set conf = dag_run.conf or {} -%}
+          {%- set requested = conf.get('backfill_tables') or [] -%}
+          {%- if 'customer_contacts_session' in (requested if requested is not string else [requested]) -%}
+          {{ conf.get('backfill_ceiling_date', '2999-12-31') }}
+          {%- else -%}
+          {{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}
+          {%- endif -%}
+      when_not_matched_by_source_delete_condition: >-
+        {%- set requested = (dag_run.conf or {}).get('backfill_tables') or [] -%}
+        {%- if 'customer_contacts_session' in (requested if requested is not string else [requested]) -%}
+        TRUE
+        {%- endif -%}

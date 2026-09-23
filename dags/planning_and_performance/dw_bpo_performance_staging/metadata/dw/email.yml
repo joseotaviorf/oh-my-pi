@@ -1,0 +1,101 @@
+database_name: dw_bpo_performance_staging
+table_name: email
+description: Email channel support metrics for BPO performance analysis, aggregating ticket volumes and handling times by agent, team, and channel. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Work email of the support agent who handled the email channel ticket.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Support team to which the agent belongs for email channel performance reporting.
+  main_department:
+    lineage:
+      - datalake_customer_support.tickets.last_queue
+    description: Main department of the agent.
+  has_exclude_tags:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+      - dw_customer_support.dim_zendesk_user.email
+    description: Boolean value indicating if the ticket has exclude tags.
+  front_or_back:
+    lineage:
+      - datalake_customer_support.tickets.front_or_back
+    description: Whether the ticket is from front or back.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent.
+  channel:
+    lineage:
+      - datalake_customer_support.tickets.channel
+    description: Support channel identifier, fixed to email for this metric table.
+  has_retention_tags:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Boolean value indicating if the ticket has retention tags.
+  sla_frt_achieved:
+    lineage:
+      - dw_customer_support.fact_tickets.minutes_first_reply_time_business
+      - dw_customer_support.fact_tickets.replies
+    description: Indicates if the ticket has SLA first reply time achieved in 6 business hours.
+  sla_rwt_achieved:
+    lineage:
+      - dw_customer_support.fact_tickets.minutes_requester_wait_time_business
+      - dw_customer_support.fact_tickets.replies
+    description: Boolean value indicating if the ticket has SLA achieved.
+  solved:
+    lineage:
+      - dw_customer_support.fact_tickets.is_solved
+    description: Boolean value indicating if the ticket is solved.
+  replies:
+    lineage:
+      - dw_customer_support.fact_tickets.replies
+    description: Number of replies to the ticket.
+  sum_rwt_min:
+    lineage:
+      - dw_customer_support.fact_tickets.minutes_requester_wait_time_business
+    description: Sum of the requester wait time in minutes, for business hours.
+  hour_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Hour of the day when the ticket was started.
+  hour_solved:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Hour of the day when the ticket was solved.
+  ts_solved_local:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Timestamp of the ticket solution.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Timestamp of the ticket creation.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
+  refined_direction:
+    lineage:
+      - dw_customer_support.fact_tickets.refined_direction
+    description: Refined direction of the ticket.

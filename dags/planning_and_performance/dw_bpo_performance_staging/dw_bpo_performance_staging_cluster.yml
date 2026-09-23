@@ -1,0 +1,11 @@
+cluster:
+  type: emr_7_12_consolidation_l_general_fleet_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.broadcastTimeout: '600'
+    core_nodes:
+      target_on_demand: 4
+      target_spot: 0
+      instance_types:
+      - m6g.4xlarge
+      - m7g.4xlarge

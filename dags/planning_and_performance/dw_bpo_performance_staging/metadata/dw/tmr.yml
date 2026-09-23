@@ -1,0 +1,48 @@
+database_name: dw_bpo_performance_staging
+table_name: tmr
+description: Time to Mean Resolution (TMR) metric details for BPO performance analysis, complementing ticket resolution time reporting with taxonomy context. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  dt_created:
+    lineage:
+      - datalake_customer_support.chats.dt_created
+    description: Date the chat was created.
+  department:
+    lineage:
+      - datalake_customer_support.chats.department
+    description: Department where the chat was handled.
+  analyst:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload.From
+    description: Analyst who answered the chat.
+  avg_tmr:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+    description: Average TMR of the chat.
+  volume_message_less_than_5min:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.id
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+    description: Volume of messages less than 5 minutes.
+  total_message_volume:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.id
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+    description: Total volume of messages.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

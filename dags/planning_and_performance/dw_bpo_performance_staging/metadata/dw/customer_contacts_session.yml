@@ -1,0 +1,198 @@
+database_name: dw_bpo_performance_staging
+table_name: customer_contacts_session
+description: Customer contact session view for BPO performance reporting, combining contact-level activity, department routing, agent context, satisfaction outcomes, and recontact flags into a single session grain. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: diego.carvalho@quintoandar.com.br
+columns:
+  sk_support_session:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_support_session
+    description: Support session identifier for the contact.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Task identifier associated with the contact.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_user
+      - dw_customer_support.fact_tickets.sk_user
+    description: User identifier associated with the contact.
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Ticket identifier associated with the contact.
+  sk_support_session_fallback_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_support_session
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Fallback key used to join contact and ticket-based records when the support session is not available.
+  sk_last_analyst:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_analyst
+    description: Analyst identifier associated with the last interaction of the contact.
+  last_area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Area of the last department assigned to the contact.
+  front_or_back:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: Indicates whether the last department belongs to front or back office.
+  last_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team of the last department assigned to the contact.
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Last department associated with the contact after routing and transfer normalization.
+  transferred_from:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department from which the contact was transferred.
+  transferred_from_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team from which the contact was transferred.
+  transferred_to:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department to which the contact was transferred.
+  transferred_to_team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Team to which the contact was transferred.
+  status:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.status
+    description: Contact status after the interaction lifecycle is completed.
+  theme:
+    lineage:
+      - dw_support_journey.fact_services.theme
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme classification associated with the contact or support service.
+  theme_detail:
+    lineage:
+      - dw_support_journey.fact_services.theme_detail
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Detailed theme classification associated with the contact or support service.
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the agent who handled the interaction.
+  agent_organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent handling the interaction.
+  agent_organization_calc:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Normalized organization label derived from the agent email domain.
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Communication channel of the contact, such as chat or call.
+  is_interaction_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_interaction_answered
+    description: Flag indicating whether the interaction was answered.
+  is_first_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_first_interaction
+    description: Indicates whether this interaction is the first one in the contact sequence.
+  is_last_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_last_interaction
+    description: Indicates whether this interaction is the last one in the contact sequence.
+  is_first_department_interaction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
+    description: Indicates whether this was the first interaction in the assigned department.
+  is_spoc_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_spoc_task
+    description: Indicates whether the interaction is a Single Point of Contact task.
+  direction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.direction
+    description: Direction of the interaction, typically inbound or outbound.
+  dt_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Date of the interaction creation timestamp adjusted to the local business timezone.
+  sk_session_key:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+      - dw_customer_support.fact_customer_contacts.sk_support_session
+    description: Business key used to identify the session consistently across ticket and support-session joins.
+  satisfaction_score:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: Satisfaction score associated with the contact or its ticket.
+  is_detractor:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: Indicator that the contact received a detractor satisfaction score.
+  is_promoter:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: Indicator that the contact received a promoter satisfaction score.
+  has_satisfaction_response:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_score
+    description: Indicates whether a satisfaction response exists for the contact.
+  ts_submitted:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.ts_submitted
+      - dw_satisfaction_rating.fact_ticket_csat.ts_first_response
+    description: Timestamp of the satisfaction response associated with the contact.
+  csat_comment:
+    lineage:
+      - dw_satisfaction_rating.fact_ticket_csat.first_csat_comment
+      - dw_satisfaction_rating.dim_answer.respondent_comments
+    description: Initial comment in the customer satisfaction survey recorded for the ticket or support session.
+  resolution_survey:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.is_solved
+      - dw_satisfaction_rating.fact_ticket_csat.is_solved
+    description: Resolution indicator coming from the satisfaction survey response.
+  recontact_flag:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+      - dw_customer_support.fact_customer_contacts.sk_user
+      - dw_customer_support.dim_department.team
+    description: Indicates whether the contact is followed by a new interaction within the configured recontact window.
+  theme_recontact_flag:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+      - dw_customer_support.fact_customer_contacts.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_support_journey.fact_services.theme
+    description: Indicates whether the contact is followed by a new interaction in the same theme within the recontact window.
+  theme_recontact_flag_d0:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+      - dw_customer_support.fact_customer_contacts.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_support_journey.fact_services.theme
+    description: Indicates whether the contact is followed by a same-theme interaction on the same day.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into data warehouse.

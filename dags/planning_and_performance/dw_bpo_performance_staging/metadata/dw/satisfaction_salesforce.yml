@@ -1,0 +1,145 @@
+database_name: dw_bpo_performance_staging
+table_name: satisfaction_salesforce
+description: Data structure for Salesforce case survey responses
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_answer_csat:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.sk_answer
+    description: Unique surrogate key for the CSAT answer.
+  first_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.ts_submitted
+    description: Timestamp of the first submitted CSAT response.
+  first_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+    description: Satisfaction score rating given by the respondent.
+  first_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.dim_answer.respondent_comments
+    description: Text comments provided by the respondent in the CSAT survey.
+  client_type_csat:
+    lineage:
+      - datalake_salesforce_clean.events_case_member.type__c
+    description: Cleaned classification of the client type (Inquilino, Proprietário, or Sem Definição).
+  is_solved:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.is_solved
+    description: Indicator flag showing if the case was solved at the time of the CSAT submission.
+  id_case:
+    lineage:
+      - datalake_salesforce_clean.events_case.id_record
+    description: Unique Salesforce identifier for the case record.
+  fila_omni_channel:
+    lineage:
+      - datalake_salesforce_clean.events_case.omni_channel_queue__c
+    description: The Omni-channel queue through which the case was routed.
+  last_department:
+    lineage:
+      - datalake_salesforce_clean.events_case.omni_channel_queue__c
+      - dw_support_journey.fact_requests.record_type_name
+    description: The final department assigned, fallback to record_type_name if queue is not present.
+  case_number:
+    lineage:
+      - datalake_salesforce_clean.events_case.case_number
+    description: Numeric identifier for the Salesforce case.
+  record_type_name:
+    lineage:
+      - dw_support_journey.fact_requests.record_type_name
+    description: The record type name associated with the case journey.
+  ts_created:
+    lineage:
+      - datalake_salesforce_clean.events_case.created_date
+    description: Creation timestamp of the case.
+  ts_solved:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: Timestamp when the case status was changed to 'Solved'.
+  ts_closed:
+    lineage:
+      - datalake_salesforce_clean.events_case.closed_date
+    description: Timestamp when the case was officially closed.
+  status:
+    lineage:
+      - datalake_salesforce_clean.events_case.status
+    description: The current status or lifecycle stage of the case.
+  dt_first_open:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: Timestamp of the first time the case was moved into an active (open) status.
+  criticidade:
+    lineage:
+      - datalake_salesforce_clean.events_case.type
+    description: Severity level of the case (Common, Urgent, or Emergency).
+  last_agent_email:
+    lineage:
+      - sandbox.analistas_reparos_sf.email_analista
+      - datalake_salesforce_clean.users.email
+    description: Email of the last analyst assigned to the case (or parent case context).
+  last_agent_organization:
+    lineage:
+      - sandbox.analistas_reparos_sf.email_analista
+      - datalake_salesforce_clean.users.email
+    description: Organization of the analyst involved in the case.
+  ts_termination_requested:
+    lineage:
+      - dw_rent.dim_contract.ts_termination_requested
+    description: Timestamp when the contract termination was requested.
+  dt_start:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+    description: Start date of the tenancy contract.
+  contract_journey:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+      - datalake_salesforce_clean.events_case.created_date
+    description: Journey phase indicator (ONB for onboarding within 40 days, ONG for ongoing).
+  dt_pedido_ajuda:
+    lineage:
+      - datalake_salesforce_clean.events_case_repair_follow_up.follow_up_date__c
+    description: Date when support help was requested during the repair process.
+  motivo_pedido_ajuda:
+    lineage:
+      - datalake_salesforce_clean.events_case_repair_follow_up.follow_up_help_action__c
+    description: Reason categorized for requesting repair follow-up support.
+  contestacao_aprovada:
+    lineage:
+      - datalake_salesforce_clean.events_case.repair_contestation_responsibility_approved__c
+    description: Boolean flag indicating if a repair contestation was approved.
+  reopen_count:
+    lineage:
+      - datalake_salesforce_clean.events_case.fr_case_reopen_count__c
+    description: Total number of times the case has been reopened.
+  is_infiltracao:
+    lineage:
+      - datalake_salesforce_clean.events_case_repair_item.repair_request_item_sub_category__c
+    description: Boolean flag indicating if the repair is related to leakage or water infiltration.
+  dt_max_fr:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: Maximum SLA date target for first response, calculated as dt_first_open + 1 day.
+  dt_max_end:
+    lineage:
+      - datalake_salesforce_clean.events_case.created_date
+      - datalake_salesforce_clean.events_case.type
+    description: Expected SLA completion date based on case criticality (3, 19, or 21 days from creation).
+  dt_max_end_ajustado:
+    lineage:
+      - dw_public.dim_date.is_brz_holiday
+      - datalake_salesforce_clean.events_case.created_date
+    description: Final adjusted SLA end date, shifting target by 1 day if it lands on a Saturday or holiday.
+  email_cliente:
+    lineage:
+      - datalake_salesforce_clean.events_mkt_cloud_trigger.email
+    description: Email of the person who received the survey
+  year:
+    description: Current year.
+  month:
+    description: Current month.
+  day:
+    description: Current day.
+  ts_load:
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
+

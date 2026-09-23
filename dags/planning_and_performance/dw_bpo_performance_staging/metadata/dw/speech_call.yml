@@ -1,0 +1,67 @@
+database_name: dw_bpo_performance_staging
+table_name: speech_call
+description: Speech analytics call records for BPO performance monitoring, capturing caller and destination numbers, call direction, provider, and recording metadata. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  id_source_unique:
+    lineage:
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_task
+    description: The unique identifier of the source call or task.
+  caller_phone_number:
+    lineage:
+      - datalake_customer_support.calls.from_phone_number
+    description: Phone number of the customer or agent who initiated the speech analytics call.
+  destination_phone_number:
+    lineage:
+      - datalake_customer_support.calls.to_phone_number
+    description: Phone number that received the speech analytics call.
+  direction:
+    lineage:
+      - datalake_customer_support.calls.direction
+    description: Call direction indicator (inbound or outbound) for the speech analytics record.
+  provider:
+    lineage:
+      - 'Twilio'
+    description: Telephony provider that routed the speech analytics call (e.g. Twilio).
+  agent_email:
+    lineage:
+      - datalake_customer_support.calls.worker_email
+    description: Email of the agent who answered the call.
+  organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Organization of the agent who answered the call.
+  country_code:
+    lineage:
+      - 'BR'
+    description: Country code of the agent who answered the call.
+  recording_url:
+    lineage:
+      - datalake_bigfone_clean.call.recording_url
+    description: URL link to the audio recording of the speech analytics call session.
+  ts_started:
+    lineage:
+      - datalake_bigfone_clean.call.ts_started
+    description: Timestamp of the start of the call.
+  ts_ended:
+    lineage:
+      - datalake_bigfone_clean.call.ts_ended
+    description: Timestamp of the end of the call.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

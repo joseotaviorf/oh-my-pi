@@ -1,0 +1,389 @@
+database_name: dw_bpo_performance_staging
+table_name: cases_perspective
+description: Unified case perspective combining Zendesk tickets and Salesforce cases for BPO submission, including SPOC and PP Multi classification flags. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  case_number:
+    lineage:
+      - datalake_salesforce_clean.cases.case_number
+      - dw_bpo_performance.tickets_perspective.sk_ticket
+    description: Case ID in Salesforce or Zendesk
+  ts_started:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_created
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Ticket or case opening date
+  ts_solved:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_closed
+      - datalake_salesforce_clean.events_Case.ts_event
+      - dw_bpo_performance.tickets_perspective.ts_solved
+    description: Returns the date the ticket was resolved.
+  ts_closed:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_closed
+      - dw_bpo_performance.tickets_perspective.ts_closed
+    description: Returns the date the ticket was closed.
+  sk_contract:
+    lineage:
+      - datalake_salesforce_clean.cases.id_contract
+      - dw_bpo_performance.tickets_perspective.sk_contract
+    description: Contract number related to the ticket
+  sk_user:
+    lineage:
+      - dw_public.dim_user.sk_user
+      - dw_bpo_performance.tickets_perspective.sk_user
+    description: User identifier associated with the contact.
+  channel:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.channel
+    description: Communication channel of the contact (call or chat).
+  status:
+    lineage:
+      - datalake_salesforce_clean.cases.case_status
+      - dw_bpo_performance.tickets_perspective.status
+    description: Case status (Ex. Solved, Open...)
+  last_team:
+    lineage:
+      - sandbox.sla_target_salesforce.ops
+      - dw_bpo_performance.tickets_perspective.last_team
+    description: Returns the last team associated with the case.
+  last_area:
+    lineage:
+      - sandbox.sla_target_salesforce.area
+      - dw_bpo_performance.tickets_perspective.last_area
+    description: Returns the last area belonging to the Case.
+  front_or_back:
+    lineage:
+      - sandbox.sla_target_salesforce.Front_Or_Back
+      - dw_bpo_performance.tickets_perspective.front_or_back
+    description: Indicates whether the Case belongs to the Front or Back.
+  last_department:
+    lineage:
+      - sandbox.sla_target_salesforce.ops
+      - datalake_salesforce_clean.cases.case_type
+      - datalake_salesforce_clean.record_types.record_type_name
+      - dw_bpo_performance.tickets_perspective.last_department
+    description: Returns the last department/queue associated with the case.
+  first_csat_ts_response:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.ts_submitted
+      - dw_bpo_performance.tickets_perspective.first_csat_ts_response
+    description: Date of the first response in the Satisfaction Survey related to that case.
+  first_csat_score:
+    lineage:
+      - dw_satisfaction_rating.fact_answer.satisfaction_score
+      - dw_bpo_performance.tickets_perspective.first_csat_score
+    description: First satisfaction score applied to that case in the Satisfaction Survey.
+  first_csat_comment:
+    lineage:
+      - dw_satisfaction_rating.dim_answer.respondent_comments
+      - dw_bpo_performance.tickets_perspective.first_csat_comment
+    description: Comment related to the first score of the case satisfaction survey.
+  resolution_survey:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.resolution_survey
+    description: Indicates whether the case was resolved or solved, through the satisfaction survey.
+  minutes_first_reply_time_business:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_created
+      - datalake_salesforce_clean.email_message.ts_message
+      - dw_bpo_performance.tickets_perspective.minutes_first_reply_time_business
+    description: Time in business minutes it took for the first response to the case.
+  subject:
+    lineage:
+      - datalake_salesforce_clean.cases.case_subject
+      - dw_bpo_performance.tickets_perspective.subject
+    description: Subject related to the case
+  theme:
+    lineage:
+      - datalake_salesforce_clean.record_types.developer_name
+      - dw_bpo_performance.tickets_perspective.theme
+    description: Taxonomy related to contact (Theme)
+  theme_detail:
+    lineage:
+      - datalake_salesforce_clean.cases.case_type
+      - dw_bpo_performance.tickets_perspective.theme_detail
+    description: Detailed taxonomy related to contact
+  theme_recontact_flag_d4:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.theme_recontact_flag_d4
+    description: Return the date to 3 days prior to the creation of the current ticket for the Recontact calculation.
+  theme_recontact_flag_d0:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.theme_recontact_flag_d0
+    description: Indicates whether the customer from that ticket returned again on the same day to discuss the same issue.
+  is_ticket_solved_within_sla:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_created
+      - datalake_salesforce_clean.cases.ts_closed
+      - datalake_salesforce_clean.events_Case.ts_event
+      - sandbox.sla_target_salesforce.sla_tgt
+      - dw_bpo_performance.tickets_perspective.is_ticket_solved_within_sla
+    description: Indicates whether the case was resolved within or outside the SLA. the same issue.
+  last_agent_email:
+    lineage:
+      - datalake_salesforce_clean.users.email
+      - dw_bpo_performance.tickets_perspective.last_agent_email
+    description: Returns the last analyst assigned to the case.
+  last_agent_organization:
+    lineage:
+      - datalake_salesforce_clean.users.email
+      - dw_bpo_performance.tickets_perspective.last_agent_organization
+    description: Returns the organization of the analyst of the last analyst assigned to the case.
+  reopens:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.reopens
+    description: Volume of reopens that the ticket received.
+  is_spoc_test:
+    lineage:
+      - dw_offboarding.fact_terminations.is_spoc_contract
+      - dw_offboarding.fact_terminations.ts_termination_request
+      - dw_offboarding.fact_terminations.is_spoc_control_group
+    description: Boolean flag indicating whether the case belongs to the SPOC (Single Point of Contact) test group.
+  is_pp_multi:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.is_pp_multi_active
+      - datalake_pro_owners.daily_owner_houses_quantity_history.ongoing_houses
+      - dw_bpo_performance.tickets_perspective.is_pp_multi
+    description: Boolean flag indicating whether the case is associated with a PP Multi subscription contract.
+  off_area:
+    lineage:
+      - datalake_salesforce_clean.cases.case_type
+      - dw_bpo_performance.tickets_perspective.off_area
+    description: Returns the macro area of the Offboarding team associated with the ticket (e.g., AR, AC, Mediation...)
+  tags:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.tags
+    description: Returns the list of tags applied to the ticket.
+  replies:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_message
+      - dw_bpo_performance.tickets_perspective.replies
+    description: Volume of public comments made on the case
+  ticket_type:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.ticket_type
+    description: Returns the type assigned to the ticket (e.g., "Problem", "Incident")
+  canal_de_entrada:
+    lineage:
+      - datalake_salesforce_clean.cases.case_origin
+      - dw_bpo_performance.tickets_perspective.canal_de_entrada
+    description: Indicates the ticket's entry channel (e.g., API, WhatsApp, Front End).
+  is_auto_reparo:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.canal_de_entrada
+      - dw_bpo_performance.tickets_perspective.group_name_ro
+    description: Identify whether it is part of Self-Service in Repair Operations.
+  group_name_ro:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.group_name_ro
+    description: Returns the queue/department associated with the Repair ticket.
+  criticidade_ro:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.criticidade_ro
+    description: Returns the criticality level to Repair tickets.
+  flag_sla_reparos:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.ts_solved
+      - dw_public.dim_date.is_brz_holiday
+    description: Indicates whether the repair ticket was completed within the SLA.
+  flag_sla_med:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_finished
+      - datalake_date.workday_window.dt_end_9
+    description: Indicates whether the mediation case was handled within the SLA.
+  tkt_despejo:
+    lineage:
+      - dw_bpo_performance.tickets_perspective.tipo_de_cliente
+      - dw_bpo_performance.tickets_perspective.tipo_de_demanda
+      - dw_bpo_performance.tickets_perspective.tipo_de_processo
+    description: It identifies whether the case involves an eviction claim.
+  first_resolution_last_agent:
+    lineage:
+      - datalake_salesforce_clean.cases.ts_closed
+      - dw_bpo_performance.tickets_perspective.ts_solved
+    description: Returns the date of the first resolution by the analyst associated with the ticket.
+  supplied_email:
+    lineage:
+      - datalake_salesforce_clean.cases.supplied_email
+    description: Return email associated with the requester in Salesforce.
+  client_type:
+    lineage:
+      - datalake_salesforce_clean.events_case.client_type__c
+      - dw_bpo_performance.tickets_perspective.tipo_de_cliente
+    description: Returns the type of client related to the case (e.g., tenant, owner).
+  id_inspection:
+    lineage:
+      - datalake_salesforce_clean.events_case.inspection_external_id__c
+    description: External inspection ID that is manually entered by the analyst in Salesforce.
+  id_house:
+    lineage:
+      - datalake_salesforce_clean.events_case.property_id__c
+    description: Property ID related to the contract being mediated on Salesforce during customer service.
+  is_eviction:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_eviction__c
+    description: Indicates whether the contract related to the case is part of the eviction process when in Offboarding.
+  is_kirk:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_kirk__c
+    description: Indicates whether the contract related to the case is part of Kirk's process.
+  case_reason:
+    lineage:
+      - datalake_salesforce_clean.events_case.reason
+    description: Reason for opening or closing the case.
+  is_high_value:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_high_value__c
+    description: Indicates whether the contract related to the case involves a rental agreement above 2500 reais.
+  criticidade_sla:
+    lineage:
+      - datalake_salesforce_clean.events_case.criticality_sla__c
+    description: Indicates the SLA by criticality when repairs are being carried out.
+  sla_tgt:
+    lineage:
+      - dw_customer_support.po_performance.fact_tickets.sla_target
+      - sandbox.sla_target_salesforce.sla_tgt
+      - datalake_salesforce_clean.case_milestones.target_response_in_days
+    description: SLA that the case must be resolved
+  record_type_name:
+    lineage:
+      - datalake_salesforce_clean.record_types.record_type_name
+    description: Taxonomy in Portuguese registered in Salesforce
+  event_type:
+    lineage:
+      - datalake_salesforce_clean.events_case.event_type
+    description: Indicates case status.
+  platform:
+    categories:
+        Salesforce: Salesforce Platform
+        Zendesk: Zendesk Platform
+    description: It indicates which platform the case belongs to.
+  id_case:
+    lineage:
+      - datalake_salesforce_clean.events_case.id_record
+      - dw_bpo_performance.tickets_perspecive.sk_ticket
+    description: SK identifying the case
+  agent_solved:
+    lineage:
+      - datalake_salesforce_clean.events_user.email
+      - dw_bpo_performance.tickets_perspecive.last_agent_email
+    description: Email identifying the person who triggered the "solved" event for the case.
+  agent_solved_organization:
+    lineage:
+      - datalake_salesforce_clean.events_user.email
+      - dw_bpo_performance.tickets_perspecive.last_agent_organization
+    description: Organization of the person responsible for the solution
+  ts_termination_finished:
+    lineage:
+      - dw_offboarding.fact_terminations.ts_termination_finished
+    description: Termination process completion date
+  minutes_first_reply_time_calendar:
+    lineage:
+      - dw_support_journey.fact_requests.ts_created
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes between case creation and the first reply.
+  minutes_first_reply_open_time_business:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Business time in minutes from the first case status movement until the first reply.
+  minutes_first_reply_open_time_calendar:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes from the first case status movement until the first reply.
+  minutes_first_reply_open_time_calendar:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+      - datalake_salesforce_clean.events_email_message.message_date
+    description: Total calendar time in minutes from the first case status movement until the first reply.
+  dt_first_open:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_modified_date
+    description: First date/time the status changed, indicating the start of handling.
+  dt_reopen:
+    lineage:
+      - datalake_salesforce_clean.events_case.reopened_at__c
+    description: Date and time when the ticket was reopened.   
+  last_customer_interaction:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_customer_interaction__c
+    description: Timestamp of the last contact/interaction made by the customer on the ticket.   
+  last_agent_interaction:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_agent_interaction__c
+    description: Timestamp of the last interaction made by an agent on the ticket. 
+  last_front_comment_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.last_front_comment_date__c
+    description: Date of the last comment inserted by the Front Office on the case.
+  untreated_front_comment:
+    lineage:
+      - datalake_salesforce_clean.events_case.untreated_front_comment__c
+    description: Flag indicating if there is a pending Front Office comment to be handled by the Backoffice.
+  journey_csi:
+    lineage:
+      - datalake_salesforce_clean.events_case.journey__c
+    description: The journey stage the customer is currently in.
+  case_to_be_handled:
+    lineage:
+      - datalake_salesforce_clean.events_case.case_to_be_handled__c
+    description: Marker indicating whether the case should be actively handled.
+  microtaxonomy_ra:
+    lineage:
+      - datalake_salesforce_clean.events_case.microtaxonomy__c
+    description: Granular classification of the subject/reason for the ticket.
+  csat_survey_sent:
+    lineage:
+      - datalake_salesforce_clean.events_case.csat_survey_sent__c
+    description: Flag indicating whether the CSAT survey has been sent.
+  dt_repair_service_provider_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.repair_service_provider_date__c
+    description: Scheduled/recorded date for service execution by the provider.
+  dt_ra_public_response_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_public_response_date__c
+    description: Date the company's response was published on Reclame Aqui.
+  id_ra_external_id:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_external_id__c
+    description: External ID of the complaint on Reclame Aqui.
+  dt_ra_creation_date:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_creation_date__c
+    description: Official date the complaint was created on Reclame Aqui.
+  ra_resolved_issue:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_resolved_issue__c
+    description: Customer's response on Reclame Aqui regarding whether the issue was resolved.
+  ra_back_doing_business:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_back_doing_business__c
+    description: Customer's indication on Reclame Aqui whether they would do business again.
+  ra_rating:
+    lineage:
+      - datalake_salesforce_clean.events_case.ra_rating__c
+    description: Rating assigned by the customer to the service on Reclame Aqui.
+  year:
+    lineage:
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Year of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
+  month:
+    lineage:
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Month of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
+  day:
+    lineage:
+      - datalake_salesforce_clean.events_case.created_date
+      - dw_bpo_performance.tickets_perspective.ts_started
+    description: Day of the case/ticket start date (ts_started). Partition column — always filter on it for partition pruning.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse

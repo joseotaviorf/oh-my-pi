@@ -1,0 +1,90 @@
+database_name: dw_bpo_performance_staging
+table_name: csat_front
+description: Front-office CSAT survey results linked to support tickets, capturing agent, team, and taxonomy context for BPO customer satisfaction analysis. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Work email of the front-office agent who handled the ticket associated with the CSAT response.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Support team to which the front-office agent belongs at the time of the CSAT survey.
+  channel:
+    lineage:
+      - dw_customer_support.fact_tickets.channel
+    description: Support channel through which the ticket linked to the CSAT response was opened.
+  main_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Main department of the agent.
+  csat_comment:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.first_csat_comment
+    description: First CSAT comment of the ticket.
+  step_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.step_tag
+    description: Taxonomy step tag classifying the customer journey stage at the time of the CSAT survey.
+  motivation:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation of the ticket.
+  customer_type_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type tag of the ticket.
+  contact_theme_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Theme tag of the ticket.
+  contact_theme_detail_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail tag of the ticket.
+  resolution_survey:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.is_solved
+    description: Resolution survey of the ticket.
+  csat_score:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.first_csat_score
+    description: First CSAT score of the ticket.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Timestamp of the ticket creation.
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Timestamp of the ticket closing.
+  ts_response:
+    lineage:
+      - dw_customer_support.fact_ticket_csat.ts_first_response
+    description: Timestamp of the first response.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date 
+    description: Current day.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

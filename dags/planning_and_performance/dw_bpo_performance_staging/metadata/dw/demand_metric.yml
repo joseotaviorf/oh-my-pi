@@ -1,0 +1,145 @@
+database_name: dw_bpo_performance_staging
+table_name: demand_metric
+description: Demand volume and handling metrics for BPO support tickets, tracking ticket status, agent workload, SLA exceed time, and department dimensions. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  sk_agent:
+    lineage:
+      - dw_customer_support.fact_tickets.sk_last_analyst
+    description: Surrogate key for the agent, cast from agent_email.
+  sla_target:
+    lineage:
+      - dw_customer_support.fact_tickets.sla_target
+    description: SLA target of the ticket.
+  channel:
+    lineage:
+      - 'email'
+    description: Support channel through which the demand ticket was opened (e.g. email, chat, phone).
+  status:
+    lineage:
+      - dw_customer_support.dim_ticket.status
+    description: Current workflow status of the demand ticket (e.g. open, pending, solved).
+  agent_email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Work email of the support agent assigned to the demand ticket.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent.
+  department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Department of the ticket.
+  journey_step:
+    lineage:
+      - dw_customer_support.dim_department.journey_step
+    description: Journey step of the ticket.
+  front_or_back:
+    lineage:
+      - dw_customer_support.dim_department.front_or_back
+    description: If ticket is from front or back.
+  team:
+    lineage:
+      - dw_customer_support.dim_department.team
+    description: Support team responsible for handling the demand ticket.
+  area:
+    lineage:
+      - dw_customer_support.dim_department.area
+    description: Business area within customer support that owns the demand ticket.
+  contact_motivation_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation of the ticket.
+  contact_theme_detail_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail of the ticket.
+  customer_type_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Tags of the ticket.
+  step_tag:
+    lineage:
+      - dw_customer_support.dim_taxonomy.step_tag
+    description: Taxonomy step tag classifying the customer journey stage of the demand ticket.
+  tag:
+    lineage:
+      - dw_customer_support.dim_ticket.tags
+    description: Tags of the ticket.
+  time_spent_solved_within_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Days elapsed business of the ticket.
+  time_spent_solved_with_exceed_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+      - dw_customer_support.fact_tickets.sla_target
+    description: Total handling time in minutes for tickets solved after exceeding the defined SLA target.
+  days_worked:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Business days worked in the ticket.
+  days_off:
+    lineage:
+      - dw_customer_support.fact_tickets.days_off
+    description: Number of non-business days excluded from SLA calculation for the demand ticket.
+  leadtime_day:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+    description: Leadtime day of the ticket.
+  is_ticket_solved_within_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business 
+      - dw_customer_support.fact_tickets.sla_target
+    description: Boolean value indicating if the ticket is solved within SLA.
+  is_ticket_solved_with_exceed_sla:
+    lineage:
+      - dw_customer_support.fact_tickets.days_elapsed_business
+      - dw_customer_support.fact_tickets.sla_target
+    description: Boolean value indicating if the ticket is solved with exceed SLA.
+  is_received_demand:
+    lineage:
+      - "True"
+    description: Boolean value indicating if the ticket is received demand.
+  is_solved_demand:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Boolean indicating if the ticket was solved or not.
+  is_closed_demand:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Boolean indicating if the ticket was closed or not.
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+    description: Timestamp of the ticket creation.
+  ts_solved:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_solved
+    description: Timestamp of the ticket solution.
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_closed
+    description: Timestamp of the ticket closing.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date 
+    description: Current day.
+  ts_load:
+    lineage:
+      - NOW()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.

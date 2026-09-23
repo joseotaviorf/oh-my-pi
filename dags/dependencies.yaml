@@ -275,6 +275,49 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.salesforce:load-clean-terminations:first-run-of-day
   - bietlejuice.terminator:load-clean-termination-characteristics:first-run-of-day
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics:first-run-of-day
+bietlejuice.dw_bpo_performance_staging:
+  - bietlejuice.bigfone:load-clean-call:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ivr-interactions:first-run-of-day
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection:first-run-of-day
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-report-inspections:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination:first-run-of-day
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations:first-run-of-day
+  - bietlejuice.dw_offboarding_obt:load-dw-offboarding-obt-offboarding:first-run-of-day
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows:first-run-of-day
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer:first-run-of-day
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer:first-run-of-day
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
+  - bietlejuice.dw_support_journey:load-dw-support-journey-dim-analyst:first-run-of-day
+  - bietlejuice.dw_support_journey:load-dw-support-journey-fact-requests:first-run-of-day
+  - bietlejuice.dw_support_journey:load-dw-support-journey-fact-services:first-run-of-day
+  - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
+  - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
+  - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history:first-run-of-day
+  - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers:first-run-of-day
+  - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
+  - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays:first-run-of-day
+  - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
+  - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
+  - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics:first-run-of-day
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-1w-before:first-run-of-day
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-2w-before:first-run-of-day

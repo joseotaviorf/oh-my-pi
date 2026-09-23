@@ -1057,6 +1057,10 @@ bietlejuice.reverse_webhelp:
   # dw_bpo_performance.tickets_perspective is no longer produced; the query reads its frozen history.
   remove:
     - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
+bietlejuice.dw_bpo_performance_staging:
+  # dw_bpo_performance.tickets_perspective is no longer produced; cases_perspective reads its frozen history.
+  remove:
+    - bietlejuice.dw_bpo_performance:load-dw-bpo-performance-tickets-perspective:first-run-of-day
 bietlejuice.reverse_birdie:
   remove:
     - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users:first-run-of-day

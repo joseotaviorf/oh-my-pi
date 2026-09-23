@@ -1,0 +1,63 @@
+database_name: dw_bpo_performance_staging
+table_name: twilio_chat_aht
+description: Twilio chat Average Handling Time (AHT) metrics for BPO performance reporting, measuring agent chat session duration and productivity. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  dt_task_created_local:
+    lineage:
+      - datalake_customer_support.chat_aht.dt_task_created_local
+    description: Date the task was created in the fifth messenger, in the BR timezone format.
+  agent_email:
+    lineage:
+      - datalake_customer_support.chat_aht.agent_email
+    description: Email of the analyst who signed the task.
+  department_name:
+    lineage:
+      - datalake_customer_support.chat_aht.department_name
+    description: Department name where the task was handled.
+  ts_start_first_task:
+    lineage:
+      - datalake_customer_support.chat_aht.ts_start_first_task
+    description: Timestamp that indicates when the first task started.
+  ts_end_last_task:
+    lineage:
+      - datalake_customer_support.chat_aht.ts_end_last_task
+    description: Timestamp that indicates when the first task ended.
+  tasks:
+    lineage:
+      - datalake_customer_support.chat_aht.tasks
+    description: Task count.
+  organization:
+    lineage:
+      - datalake_customer_support.chat_aht.agent_organization
+    description: Organization of the agent who signed the task.
+  average_concurrency:
+    lineage:
+      - datalake_customer_support.chat_aht.average_concurrency
+    description: Average concurrency of the agent who signed the task. It is the average number of tasks that the agent was handling at the same time.
+  average_handling_time_seconds:
+    lineage:
+      - datalake_customer_support.chat_aht.average_handling_time_seconds
+    description: Average handling time of the agent who signed the task in seconds.
+  area_aux:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+    description: Area of the agent who signed the task.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
+    

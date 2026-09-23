@@ -1,0 +1,70 @@
+database_name: dw_bpo_performance_staging
+table_name: taxonomy
+description: Support ticket taxonomy dimensions for BPO performance analysis, mapping channel, queue, theme, and area classifications to ticket volumes. Partitioned by year, month, and day — always filter on these columns for partition pruning.
+domain: Cross
+owner: alef.vieira@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Support channel through which tickets in this taxonomy slice were opened.
+  organization:
+    lineage:
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Organization of the agent who answered the chat.
+  queue:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Routing queue assigned to tickets in this taxonomy dimension for BPO workload analysis.
+  step:
+    lineage:
+      - dw_customer_support.dim_taxonomy.journey
+    description: Journey of the ticket.
+  client:
+    lineage:
+      - dw_customer_support.dim_taxonomy.customer_type_tag
+    description: Customer type of the ticket.
+  motivation:
+    lineage:
+      - dw_customer_support.dim_taxonomy.motivation
+    description: Motivation of the ticket.
+  theme:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme
+    description: Taxonomy theme classifying the subject matter of tickets in this dimension.
+  theme_detail:
+    lineage:
+      - dw_customer_support.dim_taxonomy.theme_detail
+    description: Theme detail of the ticket.
+  area:
+    lineage:
+      - dw_customer_support.dim_taxonomy.sub_journey
+    description: Business area within customer support associated with this taxonomy classification.
+  email:
+    lineage:
+      - dw_customer_support.dim_analyst.email
+    description: Email of the agent who answered the chat.
+  ts_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp of the creation of the ticket.
+  year:
+    lineage:
+      - current_date
+    description: Current year.
+  month:
+    lineage:
+      - current_date
+    description: Current month.
+  day:
+    lineage:
+      - current_date
+    description: Current day.
+  ts_load:
+    lineage:
+      - now()
+    description: Timestamp when this BPO performance record was loaded into the data warehouse.
