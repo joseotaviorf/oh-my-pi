@@ -565,7 +565,7 @@ The **official** carteirização flag is `is_carteirizacao`, and it lives in the
 - **Capta Aí** → AI-assisted outbound acquisition channel (visible in `planning_operation`)
 - **PP Multi** → multi-property owner program (`obt_supply.is_pp_multi_active`; `acquisition_origin` contains pp_multi variants)
 - **Indica Aí**, **afiliado**, **referral** → affiliate referral program (`acquisition_origin = 'referrals'`)
-- **Isaías**, **bot do proprietário** → agentic WhatsApp chatbot that qualifies and converts property owners from lead to opportunity (later published as first listings), running **end-to-end for every session**. In-scope Isaias sessions are isolated in the preprocessed table `datalake_supply_flows.isaias_session_attribution` (one row per session) — the primary entry point for all Isaias analysis. Raw session data lives in `datalake_sauron_clean.session`; Langfuse (`datalake_langfuse_clean`, tag `isaias_react`) is retained for **ad-hoc session-behaviour analysis only, never for conversion metrics**.
+- **Isaías**, **bot do proprietário** → agentic WhatsApp chatbot that qualifies and converts property owners from lead to opportunity (later published as first listings), running **end-to-end for every session**. In-scope Isaias sessions are isolated in `datalake_supply_flows.isaias_session_attribution` (primary backbone) plus `datalake_gsheets_clean.isaias_session_fallback` (manual fallback rows) — unioned in the session-supply ledger. Session routing attributes come from `datalake_sauron_clean.session` (legacy) with **Support Sessions Service** fallback via `datalake_support_session_service_clean.support_session`. Langfuse (`datalake_langfuse_clean`, tag `isaias_react`) is retained for **ad-hoc session-behaviour analysis only, never for conversion metrics**.
 - **Isaias host / bot** → `isaias_session_attribution.bot` identifies the host: the standalone **Isaias** number or **Isaias inside Wall-E / Mora** (QuintoAndar's main WhatsApp number). Segment by `bot` when host-level breakdowns are needed.
 - **Isaias-created lead** → a lead whose acquisition origin was Isaias itself; precise filter: `obt_supply.tp_origin_acquisition = 'isaias'` (equivalently `isaias_session_attribution.lead_acquisition_type = 'created_in_session'`). Note: `acquisition_origin` maps this to `'operations'` (grouped with other ops channels) — use `tp_origin_acquisition` for Isaias-specific analysis.
 - **Isaias-retrieved lead** → a lead that existed before and was re-engaged by Isaias in a session, regardless of its acquisition origin; identified by `isaias_session_attribution.lead_acquisition_type = 'retrieved_lead'` (the resolved lead is in `resolved_lead_id`). A retrieved lead can have any `tp_origin_acquisition` value, including `'isaias'` (a lead Isaias originally created and later retrieved again).
@@ -573,7 +573,7 @@ The **official** carteirização flag is `is_carteirizacao`, and it lives in the
 - **Isaias Autonomous Conversion** → a conversion (opportunity or first_listing) that Isaias completed end-to-end with no human involvement. Filter: `obt_supply.tp_origin_conversion = 'isaias'`; in the ledger, the supply-level flag `isaias_autonomous_conversion = TRUE`.
 - **Isaias Human Conversion** → a conversion where Isaias handled the session but an inbound human analyst closed it within 24 h of the session start. Ledger pattern: `tp_origin_conversion <> 'isaias' AND planning_operation = 'Inbound'` and the OPPORTUNITY event falls in `[ts_session_start, ts_session_start + INTERVAL '24' HOUR)`; autonomous takes priority (a supply is Human only if it is not Autonomous). In the ledger, the supply-level flag `isaias_human_conversion = TRUE`.
 - **Total Isaias Conversion** → the sum of Autonomous + Human conversions, reported for both the opportunity and first_listing steps.
-- **Transbordo**, **escalation** → handoff of a session to a human queue. Derived from the `department` field (Sauron / support-services join to `isaias_session_attribution`): a session is **escalated** when `department IS NOT NULL`, and **escalated to Inside Sales** specifically when `LOWER(department) LIKE '%is%'`.
+- **Transbordo**, **escalation** → handoff of a session to a human queue. Derived from the `department` field in the ledger (`COALESCE(sauron.department, sss.department)` — Sauron first, SSS fallback): a session is **escalated** when `department IS NOT NULL`, and **escalated to Inside Sales** specifically when `LOWER(department) LIKE '%is%'`.
 - **RENT / SALE**, **aluguel / venda** → `nm_business_context` values; always filter when the question is modality-specific
 - **acquisition_origin** → classifies HOW the lead entered the funnel (channel/product). Built from `nm_supply_source` and the acquisition-side user path (`dim_supply_user_path`, `id_level = 1`). Use for top-of-funnel breakdowns. **Never use this field to identify Isaias leads** — `'operations'` groups Isaias with other ops channels; use `tp_origin_acquisition = 'isaias'` instead.
 
@@ -708,14 +708,15 @@ Note: `conversion_origin = 'operations'` includes Isaias-closed conversions. Use
 | Contact attempts and dialing rounds per prospect | `datalake_wololo_clean.contact` (`channel`, `phone_output`, `ts_contacted` — there is **no** `call_output` column) and `datalake_wololo_clean.round` (`round_number`, `round_max_tries`). ⚠️ Join `contact` as `contact.id_prospect_reference = prospect.id_reference`, **not** to `prospect.id` (zero rows — see [Operational Layer](#operational-layer--prospect-status-routing-and-discards)). |
 | **Pre-prospect (lead-stage) records and discards** | `datalake_rene_descartes_clean.house_lead` (`status` = `HouseLeadStatus`) and `datalake_rene_descartes_clean.lead_rejection` (`origin`, `reason`, `business_context`). Filter `origin IN ('LEAD','MANUAL')` for genuine lead-stage discards. |
 | `sales_company` joined to other DW lead attributes | `dw_lead.dim_lead` (`sales_company`) — `obt_supply` has no `sales_company` column. |
-| Isaias in-scope sessions + attribution (primary entry point) | `datalake_supply_flows.isaias_session_attribution` (`isa`) — one preprocessed row per in-scope Isaias session (both hosts). Columns: `id_sauron_session`, `id_langfuse_session`, `id_sss_session`, `resolved_lead_id`, `lead_acquisition_type`, `bot`, `has_reschedule_event`, `ts_session_start`. Isolates all Isaias sessions and resolves lead attribution — **start here for every Isaias analysis**. Join to supply via `resolved_lead_id` and the `sk_chat_session` session path (see ledger, Query 2). |
-| Isaias raw session data (source_environment, department) | `datalake_sauron_clean.session` (`sau`) — one row per Sauron session; source of `source_environment` (a descriptive attribute, not an Isaias identifier) and `department` (used for escalation). Join: `CAST(sau.id AS VARCHAR) = isa.id_sauron_session`. `datalake_chatbot.sessions` is an enriched view over the same session data; both work — prefer `isaias_session_attribution` as the backbone. |
+| Isaias in-scope sessions + attribution (primary entry point) | `datalake_supply_flows.isaias_session_attribution` (`isa`) — one preprocessed row per in-scope Isaias session (both hosts). Columns: `id_sauron_session`, `id_langfuse_session`, `id_sss_session`, `resolved_lead_id`, `lead_acquisition_type`, `bot`, `has_reschedule_event`, `ts_session_start`. **For conversion / escalation metrics, start from the ledger in Query 2** (which also unions `datalake_gsheets_clean.isaias_session_fallback`, deduped on `id_langfuse_session`). Use `isa` alone only for ad-hoc session-level exploration outside the ledger. Join to supply via `resolved_lead_id` and the `sk_chat_session` session path (see ledger, Query 2). |
+| Isaias session fallback (manual rows) | `datalake_gsheets_clean.isaias_session_fallback` — GSheet-backed fallback sessions unioned into the ledger `session_dim` base when missing from `isaias_session_attribution`. |
+| Isaias raw session data (source_environment, department) | `datalake_sauron_clean.session` (`sau`) — one row per Sauron session; primary source of `source_environment` and `department`. Join: `CAST(sau.id AS VARCHAR) = isa.id_sauron_session`. **SSS fallback:** `datalake_support_session_service_clean.support_session` (`sss`) — join `sss.public_id = isa.id_sss_session` for migrated sessions; ledger uses `COALESCE(sss.source_environment, sau.source_env)` and `COALESCE(sss.department, sau.department)`. `datalake_chatbot.sessions` is an enriched view over the same session data; both work — prefer the ledger `session_dim` as the backbone. |
 | Isaias session behaviour (Langfuse — ad-hoc only) | `datalake_langfuse_clean.traces` (`t`) / `datalake_langfuse_clean.observations` (`o`) — session traces and node-level events. **Ad-hoc session-behaviour analysis only — never used for conversion, funnel, or escalation metrics.** Filter `CONTAINS(t.tags, 'isaias_react')` and `t.environment = 'prod'`; bridge to sessions via `isa.id_langfuse_session = t.id_session`. Observations have integer `year` / `month` partitions (always apply both). |
 
 **Critical rules:**
-- **`datalake_supply_flows.isaias_session_attribution` is the backbone for all Isaias metrics.** It is a preprocessed table (one row per in-scope session) that isolates every Isaias session across both hosts and resolves lead attribution — do not re-derive session scoping from `source_environment` or from Langfuse. `source_environment` (from `datalake_sauron_clean.session`) is now a descriptive attribute only, **not** an Isaias identifier; never filter Isaias sessions with a `source_environment` list or `LIKE '%isaias%'`.
+- **The session-supply ledger (Golden Query 2) is the backbone for all Isaias metrics.** It unions `datalake_supply_flows.isaias_session_attribution` with `datalake_gsheets_clean.isaias_session_fallback` (deduped on `id_langfuse_session`, attribution preferred), enriches from Sauron + SSS, and emits the `session_start` / `conversao` event stream — do not re-derive session scoping from `source_environment` or from Langfuse. `source_environment` = `COALESCE(sauron.source_environment, sss.source_env)` is a descriptive attribute only, **not** an Isaias identifier; never filter Isaias sessions with a `source_environment` list or `LIKE '%isaias%'`.
 - **Langfuse is ad-hoc only.** `datalake_langfuse_clean.traces` / `observations` are used for session-behaviour exploration only — **never for conversion, funnel, or escalation metrics**. There are no per-session feature flags to extract and no node-based step detection in the metric path. When exploring behaviour, filter `CONTAINS(t.tags, 'isaias_react')` (the current host tag) and `t.environment = 'prod'`, and always apply the integer `year` / `month` partitions on `observations`. Bridge to sessions via `isaias_session_attribution.id_langfuse_session = t.id_session`.
-- **`sk_chat_session` in `obt_supply` is VARCHAR** (built from `COALESCE(id_chat_session, '-1')`); the sentinel `'-1'` means no session. The ledger links supply events to sessions by two keys, both resolved through `isaias_session_attribution`: the **session path** (`obt.sk_chat_session = isa.id_sauron_session`) and the **resolved-lead path** (`isa.resolved_lead_id`). Both are unioned before attribution.
+- **`sk_chat_session` in `obt_supply` is VARCHAR** (built from `COALESCE(id_chat_session, '-1')`); the sentinel `'-1'` means no session. During the Sauron → **Support Sessions Service (SSS)** migration, `sk_chat_session` may hold either a Sauron numeric id or an SSS `public_id`. The ledger emits a unified **`id_session`** (`COALESCE(id_sauron_session, id_sss_session)`) and a **`session_keys` crosswalk** mapping both id spaces to it. Supply is linked by two keys: the **session path** (`obt.sk_chat_session` matched against `session_keys.session_key`) and the **resolved-lead path** (`resolved_lead_id` from `session_dim`). Both are unioned before last-session attribution.
 - **Three Isaias lead populations — never conflate them.** They are resolved by `isaias_session_attribution.lead_acquisition_type`:
   - *Created*: `tp_origin_acquisition = 'isaias'` / `lead_acquisition_type = 'created_in_session'` (bot originated the lead). These also appear as `acquisition_origin = 'operations'` — that field is too broad for Isaias-specific queries.
   - *Retrieved*: `lead_acquisition_type = 'retrieved_lead'` (bot re-engaged a pre-existing lead, regardless of origin). For conversion-side attribution: `tp_origin_conversion = 'isaias'`.
@@ -727,7 +728,7 @@ Note: `conversion_origin = 'operations'` includes Isaias-closed conversions. Use
   - *Human*: `tp_origin_conversion <> 'isaias' AND planning_operation = 'Inbound'` and the OPPORTUNITY event falls within 24 h of the session start → supply-level flag `isaias_human_conversion`. Autonomous takes priority: a supply is Human only when it is not Autonomous (`BOOL_OR(is_human) AND NOT BOOL_OR(is_autonomous)`).
   - *Total* = Autonomous + Human.
 - **The conversion-time anchor is the OPPORTUNITY event from `supply_events_tracking`, not `obt.ts_event`.** CTE: `SELECT id_lead_ebdb, business_context, MIN(ts_event_adjusted) FROM datalake_supply_flows.supply_events_tracking WHERE funnel_step = 'OPPORTUNITY' GROUP BY 1, 2`. Human-conversion window: `ct.ts_event_adjusted >= isa.ts_session_start AND ct.ts_event_adjusted < isa.ts_session_start + INTERVAL '24' HOUR`.
-- **Escalation is derived from `department`.** Join `isaias_session_attribution` to `datalake_sauron_clean.session` (support-services routing) and read `department`: a session is escalated when `department IS NOT NULL`, and escalated **to Inside Sales** when `LOWER(department) LIKE '%is%'`.
+- **Escalation is derived from `department`.** In the ledger, `department` = `COALESCE(sauron.department, sss.department)` (Sauron first, SSS fallback via `datalake_support_session_service_clean.support_session`). A session is escalated when `department IS NOT NULL`, and escalated **to Inside Sales** when `LOWER(department) LIKE '%is%'`.
 - **`obt_supply.sk_lead` equals `id_lead_ebdb` in source systems.** When joining `obt_supply` to raw source tables (Wololo via `id_reference`, OLOS via `id_lead`, `supply_events_tracking` via `id_lead_ebdb`, Rene via `id_lead_ebdb`), use `sk_lead` as the equivalent of `id_lead_ebdb`. This equivalence is used explicitly in `conversion_time` joins: `ct.id_lead_ebdb = obt.sk_lead`.
 - **Isaias conversion deduplication key is `(sk_supply, nm_business_context)` — never include `cd_funnel_step`.** A single supply can appear at both `opportunity` and `first_listing` funnel steps; including `cd_funnel_step` in a `COUNT(DISTINCT ...)` key double-counts it. Always use `CONCAT(CAST(sk_supply AS VARCHAR), '_', nm_business_context)` as the composite key when counting converted supplies in Isaias ledger queries.
 - `obt_supply` has no partition columns — filter on `obt.date` (a `DATE` column) for time-bounded queries (table is full-refresh daily). Use `DATE '...'` literals, e.g. `obt.date >= DATE '2026-01-01'`.
@@ -796,10 +797,10 @@ These are current-state counts over the Wololo prospect tables, **not** `obt_sup
 
 ### Chatbot Sessions (N:1 — many supply events may share one Isaias session)
 
-- Backbone: `datalake_supply_flows.isaias_session_attribution` (`isa`) — one row per in-scope Isaias session, already scoping both hosts and resolving lead attribution.
-- Session path (leads created by Isaias): `obt_supply.sk_chat_session = isa.id_sauron_session` where `sk_chat_session != '-1'`
+- Backbone: `datalake_supply_flows.isaias_session_attribution` (`isa`) unioned with `datalake_gsheets_clean.isaias_session_fallback` in the ledger `session_dim` — one row per in-scope Isaias session, scoping both hosts and resolving lead attribution.
+- Session path (leads created by Isaias): `obt_supply.sk_chat_session` matched against the ledger `session_keys` crosswalk (Sauron id **or** SSS `public_id`) where `sk_chat_session != '-1'`
 - Resolved-lead path (leads retrieved by Isaias): `isa.resolved_lead_id` with `isa.lead_acquisition_type = 'retrieved_lead'`
-- Raw session attributes: join to `datalake_sauron_clean.session` via `CAST(sau.id AS VARCHAR) = isa.id_sauron_session` for `source_environment` (descriptive) and `department` (escalation)
+- Raw session attributes: Sauron join `CAST(sau.id AS VARCHAR) = isa.id_sauron_session`; SSS fallback `sss.public_id = isa.id_sss_session` — ledger reads `COALESCE(sau.source_environment, sss.source_env)` and `COALESCE(sau.department, sss.department)`
 - Langfuse (ad-hoc only): `isa.id_langfuse_session = t.id_session`, tag `isaias_react`
 
 ### 3P Supply (sub-funnel — drill-in for `acquisition_origin = 'rede'`)
@@ -899,50 +900,117 @@ ORDER BY
 
 **Date anchor: coincident date (default).** The ledger exposes two date axes: `event_date` — the day a conversion occurred (the coincident axis, default) — and `session_date = DATE(ts_session_start)` — the day the session started (the cohort axis). For coincident-date reporting, group by `event_date`. For cohort reporting (only when explicitly requested), group by `session_date` and count which sessions born on each day eventually converted.
 
-This is a query pattern built on the preprocessed table `datalake_supply_flows.isaias_session_attribution`. The final UNION ALL produces two event types per session: `session_start` (one row per session, the denominator for rates) and `conversao` (one row per session × converted supply, the numerator). Valid attribution is the last session each lead appears in. Two supply-level conversion flags are emitted: `isaias_autonomous_conversion` (`tp_origin_conversion = 'isaias'`) and `isaias_human_conversion` (inbound human closed within 24 h of session start; only when not autonomous).
+This is a query pattern built on `datalake_supply_flows.isaias_session_attribution` unioned with `datalake_gsheets_clean.isaias_session_fallback` (deduped on `id_langfuse_session`, attribution preferred), enriched from **both** `datalake_sauron_clean.session` (legacy) and `datalake_support_session_service_clean.support_session` (SSS migration fallback). The ledger emits a unified `id_session` and a `session_keys` crosswalk so `obt_supply.sk_chat_session` — which may hold either a Sauron id or an SSS `public_id` — resolves to the same session. The final UNION ALL produces two event types per session: `session_start` (one row per session, the denominator for rates) and `conversao` (one row per `opportunity` / `first_listing` converted supply, the numerator). Valid attribution is the last session each lead appears in. Two supply-level conversion flags are emitted: `isaias_autonomous_conversion` (`tp_origin_conversion = 'isaias'`) and `isaias_human_conversion` (inbound human closed within 24 h of session start; only when not autonomous).
 
-> `{start_date}` is the session-window start (e.g. `2026-08-01`). The `obt_supply` lower bound (`{obt_start_date}`) is set a few days earlier to capture leads created shortly before their attributing session. **`isaias_session_attribution` has no historical backfill — data begins in August 2026, so `{start_date}` cannot be earlier than `2026-08-01`.**
+> **Data starts in the last week of July 2026** (`isaias_session_attribution` has no earlier backfill). **August 2026 is the monthly floor** — for month-level metrics, set `{start_date}` and `{obt_start_date}` both `>= DATE '2026-08-01'`; daily or weekly windows may start in late July. Set `{obt_start_date}` a few days before `{start_date}` to capture leads created shortly before their attributing session.
 
 ```sql
 WITH
--- Step 1: One row per in-scope session + Sauron source_environment / department
+-- Step 1a: Union attribution + fallback, then dedupe on id_langfuse_session (attribution wins)
+session_base_raw AS (
+    SELECT
+        id_langfuse_session,
+        id_sss_session,
+        id_sauron_session,
+        resolved_lead_id,
+        bot,
+        CAST(has_reschedule_event AS BOOLEAN) AS has_reschedule_event,
+        lead_acquisition_type,
+        CAST(ts_created AS TIMESTAMP) AS ts_session_start,
+        2 AS source_priority
+    FROM datalake_gsheets_clean.isaias_session_fallback
+    WHERE ts_created <> ''
+    UNION ALL
+    SELECT
+        id_langfuse_session,
+        id_sss_session,
+        id_sauron_session,
+        resolved_lead_id,
+        bot,
+        has_reschedule_event,
+        lead_acquisition_type,
+        ts_session_start,
+        1 AS source_priority
+    FROM datalake_supply_flows.isaias_session_attribution
+),
+session_base AS (
+    SELECT
+        id_langfuse_session,
+        id_sss_session,
+        id_sauron_session,
+        resolved_lead_id,
+        bot,
+        has_reschedule_event,
+        lead_acquisition_type,
+        ts_session_start
+    FROM (
+        SELECT
+            *,
+            ROW_NUMBER() OVER (
+                PARTITION BY id_langfuse_session
+                ORDER BY source_priority, ts_session_start DESC
+            ) AS rn
+        FROM session_base_raw
+        WHERE NULLIF(id_langfuse_session, '') IS NOT NULL
+    )
+    WHERE rn = 1
+),
+
+-- Step 1b: One row per in-scope session + source_environment / department, from BOTH systems
 session_dim AS (
     SELECT
         d.id_sauron_session,
         d.id_langfuse_session,
         d.id_sss_session,
+        -- Unified, migration-proof session key (Sauron first, SSS public_id as fallback)
+        COALESCE(NULLIF(d.id_sauron_session, ''), NULLIF(d.id_sss_session, '')) AS id_session,
         d.resolved_lead_id,
         COALESCE(d.lead_acquisition_type, 'no_lead') AS lead_acquisition_type,
         d.bot,
         d.has_reschedule_event,
-        ss.source_environment,
-        ss.department,
+        -- Pattern A: Sauron value first, SSS fallback. SSS column is source_env (not source_environment).
+        COALESCE(ss.source_environment, sss.source_env) AS source_environment,
+        COALESCE(ss.department, sss.department) AS department,
         d.ts_session_start
-    FROM datalake_supply_flows.isaias_session_attribution d
+    FROM session_base d
     LEFT JOIN datalake_sauron_clean.session ss
         ON CAST(ss.id AS VARCHAR) = d.id_sauron_session
-    WHERE d.id_sauron_session IS NOT NULL
+    LEFT JOIN datalake_support_session_service_clean.support_session sss
+        ON sss.public_id = d.id_sss_session
+        AND sss.public_id IS NOT NULL
+    -- Pattern B: keep the session if EITHER system knows it (was: id_sauron_session IS NOT NULL)
+    WHERE COALESCE(NULLIF(d.id_sauron_session, ''), NULLIF(d.id_sss_session, '')) IS NOT NULL
         AND d.ts_session_start >= from_iso8601_timestamp('{start_date}T00:00:00Z')
 ),
 
--- Step 2: Every lead-to-session appearance, from BOTH attribution keys
+-- Step 1c: Session-key crosswalk — one row per (physical key -> unified id_session)
+session_keys AS (
+    SELECT id_sauron_session AS session_key, id_session, ts_session_start
+    FROM session_dim
+    WHERE NULLIF(id_sauron_session, '') IS NOT NULL
+    UNION
+    SELECT id_sss_session AS session_key, id_session, ts_session_start
+    FROM session_dim
+    WHERE NULLIF(id_sss_session, '') IS NOT NULL
+),
+
+-- Step 2: Every (lead -> session) appearance, from BOTH attribution keys
 lead_session_candidates AS (
-    SELECT resolved_lead_id AS lead_id, id_sauron_session AS id_session, ts_session_start
+    SELECT resolved_lead_id AS lead_id, id_session, ts_session_start
     FROM session_dim
     WHERE resolved_lead_id IS NOT NULL
-
     UNION
-
     SELECT
         CAST(o.sk_lead AS VARCHAR) AS lead_id,
-        s.id_sauron_session AS id_session,
-        s.ts_session_start
+        sk.id_session,
+        sk.ts_session_start
     FROM dw_growth.obt_supply o
-    JOIN session_dim s
-        ON o.sk_chat_session = s.id_sauron_session
+    JOIN session_keys sk
+        ON o.sk_chat_session = sk.session_key
     WHERE o.sk_chat_session IS NOT NULL
+        AND o.sk_chat_session <> '-1'
         AND o.sk_lead IS NOT NULL
-        AND o."date" >= DATE {obt_start_date}   -- a few days before {start_date}
+        AND o."date" >= DATE {obt_start_date}   -- obt lookback; a few days before {start_date}
 ),
 
 -- Step 3: Valid attribution = the LAST session each lead appears in
@@ -969,9 +1037,10 @@ conversion_time AS (
     GROUP BY 1, 2
 ),
 
--- Step 5: Attributed opportunity / first-listing rows (one per funnel step / context) + OBT attributes
+-- Step 5: Attributed opportunity / first-listing rows + OBT attributes
 conv_rows AS (
     SELECT
+        sd.id_session,
         sd.id_sauron_session, sd.id_langfuse_session, sd.id_sss_session,
         sd.lead_acquisition_type, sd.bot, sd.has_reschedule_event, sd.source_environment, sd.department, sd.ts_session_start,
         CAST(o.sk_lead AS VARCHAR) AS lead_id,
@@ -981,6 +1050,7 @@ conv_rows AS (
         o."date" AS event_date,
         o.city_group,
         o.cd_discard_reason,
+        o.sk_house,
         o.discard_funnel_step,
         o.operation_channel,
         o.company_report_origin,
@@ -999,7 +1069,7 @@ conv_rows AS (
     JOIN valid_attribution va
         ON CAST(o.sk_lead AS VARCHAR) = va.lead_id
     JOIN session_dim sd
-        ON va.id_session = sd.id_sauron_session
+        ON va.id_session = sd.id_session
     LEFT JOIN conversion_time ct
         ON o.sk_lead = ct.id_lead_ebdb
         AND o.nm_business_context = ct.business_context
@@ -1007,22 +1077,31 @@ conv_rows AS (
         AND o."date" >= DATE {obt_start_date}
 ),
 
--- Step 6: Supply-level validity: a supply is a valid conversion if any of its rows qualifies
+-- Step 6: Supply-level validity (grain now the unified id_session)
 valid_supply AS (
     SELECT
-        id_sauron_session, sk_supply, nm_business_context,
+        id_session, sk_supply, nm_business_context,
         BOOL_OR(is_autonomous) AS supply_autonomous,
         (BOOL_OR(is_human) AND NOT BOOL_OR(is_autonomous)) AS supply_human
     FROM conv_rows
-    GROUP BY id_sauron_session, sk_supply, nm_business_context
+    GROUP BY id_session, sk_supply, nm_business_context
 ),
 
--- Step 7: Union the two event types
+-- Step 7: Distinct leads with drafts to prevent fan-out
+leads_with_drafts AS (
+    SELECT DISTINCT
+        CAST(id_original_lead AS VARCHAR) AS lead_id
+    FROM datalake_bob_clean.house_draft
+    WHERE id_original_lead IS NOT NULL
+),
+
+-- Step 8: Union the two event types
 events AS (
-    -- session_start: one per session (denominator)
+    -- session_start: one per session
     SELECT
         'session_start' AS event_type,
         CAST(ts_session_start AS DATE) AS event_date,
+        id_session,
         id_sauron_session, id_langfuse_session, id_sss_session,
         CAST(ts_session_start AS DATE) AS session_date,
         source_environment,
@@ -1031,28 +1110,29 @@ events AS (
         has_reschedule_event,
         lead_acquisition_type,
         resolved_lead_id AS lead_id,
-        CAST(NULL AS VARCHAR)  AS nm_business_context,
-        CAST(NULL AS VARCHAR)  AS funnel_step,
-        CAST(NULL AS VARCHAR)  AS sk_supply,
-        CAST(NULL AS VARCHAR)  AS city_group,
-        CAST(NULL AS VARCHAR)  AS cd_discard_reason,
-        CAST(NULL AS VARCHAR)  AS discard_funnel_step,
-        CAST(NULL AS VARCHAR)  AS operation_channel,
-        CAST(NULL AS VARCHAR)  AS company_report_origin,
-        CAST(NULL AS VARCHAR)  AS planning_cluster,
-        CAST(NULL AS VARCHAR)  AS tp_origin_acquisition,
-        CAST(NULL AS VARCHAR)  AS tp_origin_conversion,
-        CAST(NULL AS VARCHAR)  AS planning_operation,
-        CAST(NULL AS BOOLEAN)  AS isaias_autonomous_conversion,
-        CAST(NULL AS BOOLEAN)  AS isaias_human_conversion
+        CAST(NULL AS VARCHAR) AS nm_business_context,
+        CAST(NULL AS VARCHAR) AS funnel_step,
+        CAST(NULL AS VARCHAR) AS sk_supply,
+        CAST(NULL AS DATE) AS "date",
+        CAST(NULL AS VARCHAR) AS city_group,
+        CAST(NULL AS VARCHAR) AS cd_discard_reason,
+        CAST(NULL AS BIGINT) AS sk_house,
+        CAST(NULL AS VARCHAR) AS discard_funnel_step,
+        CAST(NULL AS VARCHAR) AS operation_channel,
+        CAST(NULL AS VARCHAR) AS company_report_origin,
+        CAST(NULL AS VARCHAR) AS planning_cluster,
+        CAST(NULL AS VARCHAR) AS tp_origin_acquisition,
+        CAST(NULL AS VARCHAR) AS tp_origin_conversion,
+        CAST(NULL AS VARCHAR) AS planning_operation,
+        CAST(NULL AS BOOLEAN) AS isaias_autonomous_conversion,
+        CAST(NULL AS BOOLEAN) AS isaias_human_conversion
     FROM session_dim
-
     UNION ALL
-
-    -- conversao: one per opportunity / first listing of a valid conversion (numerator)
+    -- conversao: one per opportunity / first listing of a valid conversion
     SELECT
         'conversao' AS event_type,
         cr.event_date,
+        cr.id_session,
         cr.id_sauron_session, cr.id_langfuse_session, cr.id_sss_session,
         CAST(cr.ts_session_start AS DATE) AS session_date,
         cr.source_environment,
@@ -1064,8 +1144,10 @@ events AS (
         cr.nm_business_context,
         cr.cd_funnel_step AS funnel_step,
         cr.sk_supply,
+        cr.event_date AS "date",
         cr.city_group,
         cr.cd_discard_reason,
+        cr.sk_house,
         cr.discard_funnel_step,
         cr.operation_channel,
         cr.company_report_origin,
@@ -1074,25 +1156,58 @@ events AS (
         cr.tp_origin_conversion,
         cr.planning_operation,
         vs.supply_autonomous AS isaias_autonomous_conversion,
-        vs.supply_human       AS isaias_human_conversion
+        vs.supply_human AS isaias_human_conversion
     FROM conv_rows cr
     JOIN valid_supply vs
-        ON cr.id_sauron_session = vs.id_sauron_session
+        ON cr.id_session = vs.id_session
         AND cr.sk_supply = vs.sk_supply
         AND cr.nm_business_context = vs.nm_business_context
     WHERE vs.supply_autonomous OR vs.supply_human
 )
 
-SELECT *
-FROM events
+SELECT
+    e.event_type,
+    e.event_date,
+    e.id_session,
+    e.id_sauron_session,
+    e.id_langfuse_session,
+    e.id_sss_session,
+    e.session_date,
+    e.source_environment,
+    e.department,
+    e.bot,
+    e.has_reschedule_event,
+    e.lead_acquisition_type,
+    e.lead_id,
+    e.nm_business_context,
+    e.funnel_step,
+    e.sk_supply,
+    e.city_group,
+    e.cd_discard_reason,
+    e.sk_house,
+    e.discard_funnel_step,
+    e.operation_channel,
+    e.company_report_origin,
+    e.planning_cluster,
+    e.tp_origin_acquisition,
+    e.tp_origin_conversion,
+    e.planning_operation,
+    e.isaias_autonomous_conversion,
+    e.isaias_human_conversion,
+    COALESCE(d.lead_id IS NOT NULL, FALSE) AS has_draft_assigned
+FROM events e
+LEFT JOIN leads_with_drafts d
+    ON e.lead_id = d.lead_id
 ```
 
 **Key columns in the ledger:**
+- **`id_session`**: unified session key (`COALESCE(id_sauron_session, id_sss_session)`) — the attribution grain for conversions. **Session-volume counts always use `id_langfuse_session`** (every in-scope session has one; `session_base` dedupes and drops rows without it).
 - **`event_type`**: `'session_start'` (one per in-scope session — the rate denominator) or `'conversao'` (one per session × valid converted supply — the numerator).
-- **`lead_acquisition_type`**: `'created_in_session'`, `'retrieved_lead'`, or `'no_lead'` — resolved by `isaias_session_attribution`.
+- **`lead_acquisition_type`**: `'created_in_session'`, `'retrieved_lead'`, or `'no_lead'` — resolved in `session_base` (attribution preferred over fallback on dedup).
 - **`bot`**: host (standalone Isaias vs Isaias inside Wall-E / Mora).
 - **`isaias_autonomous_conversion`** / **`isaias_human_conversion`**: supply-level conversion flags (autonomous takes priority — a supply is Human only if not Autonomous).
 - **`event_date`** vs **`session_date`**: conversion day vs session-start day. Coincident-date reporting (default) groups by `event_date`; cohort reporting groups by `session_date`.
+- **`has_draft_assigned`**: whether the lead has a house draft in Bob (`datalake_bob_clean.house_draft`); joined in the final SELECT to prevent fan-out in downstream analysis.
 
 ### Query 3 — Isaias conversion types by day (Autonomous / Human / Total)
 
@@ -1137,27 +1252,26 @@ GROUP BY event_date
 ORDER BY data_referencia DESC
 ```
 
-> Filter the `conversao` branch by `funnel_step` (`'opportunity'` or `'first_listing'`) for step-specific conversion counts, or by `bot` for host-level breakdowns.
+> `conversao` rows are only `opportunity` / `first_listing` funnel steps. Filter by `funnel_step` for step-specific conversion counts, or by `bot` for host-level breakdowns.
 
 ### Query 4 — Isaias escalation (transbordos) by day
 
-**Escalation is derived from the `department` field**, joining `isaias_session_attribution` to `datalake_sauron_clean.session` (support-services routing). A session is escalated when `department IS NOT NULL`, and escalated **to Inside Sales** when `LOWER(department) LIKE '%is%'`. Denominator is total in-scope sessions.
+**Escalation is derived from the `department` field** in `session_dim` (`COALESCE(sauron.department, sss.department)`). A session is escalated when `department IS NOT NULL`, and escalated **to Inside Sales** when `LOWER(department) LIKE '%is%'`. Denominator is total in-scope sessions. Build `session_base` + `session_dim` from Query 2 (Steps 1a–1b), then aggregate:
 
 ```sql
+-- (Include session_base + session_dim CTEs from Query 2 Steps 1a–1b, then:)
+
 SELECT
-    DATE(isa.ts_session_start) AS data_referencia,
-    isa.bot,
-    COUNT(DISTINCT isa.id_langfuse_session) AS total_sessions,
-    COUNT(DISTINCT CASE WHEN ss.department IS NOT NULL THEN isa.id_langfuse_session END)          AS escalated_sessions,
-    COUNT(DISTINCT CASE WHEN LOWER(ss.department) LIKE '%is%' THEN isa.id_langfuse_session END)   AS escalated_inside_sales,
-    ROUND(CAST(COUNT(DISTINCT CASE WHEN ss.department IS NOT NULL THEN isa.id_langfuse_session END) AS DOUBLE)
-        / NULLIF(COUNT(DISTINCT isa.id_langfuse_session), 0), 4)                                  AS escalation_rate,
-    ROUND(CAST(COUNT(DISTINCT CASE WHEN LOWER(ss.department) LIKE '%is%' THEN isa.id_langfuse_session END) AS DOUBLE)
-        / NULLIF(COUNT(DISTINCT isa.id_langfuse_session), 0), 4)                                  AS escalation_is_rate
-FROM datalake_supply_flows.isaias_session_attribution isa
-LEFT JOIN datalake_sauron_clean.session ss
-    ON CAST(ss.id AS VARCHAR) = isa.id_sauron_session
-WHERE isa.ts_session_start >= from_iso8601_timestamp('{start_date}T00:00:00Z')
+    DATE(sd.ts_session_start) AS data_referencia,
+    sd.bot,
+    COUNT(DISTINCT sd.id_langfuse_session) AS total_sessions,
+    COUNT(DISTINCT CASE WHEN sd.department IS NOT NULL THEN sd.id_langfuse_session END) AS escalated_sessions,
+    COUNT(DISTINCT CASE WHEN LOWER(sd.department) LIKE '%is%' THEN sd.id_langfuse_session END) AS escalated_inside_sales,
+    ROUND(CAST(COUNT(DISTINCT CASE WHEN sd.department IS NOT NULL THEN sd.id_langfuse_session END) AS DOUBLE)
+        / NULLIF(COUNT(DISTINCT sd.id_langfuse_session), 0), 4) AS escalation_rate,
+    ROUND(CAST(COUNT(DISTINCT CASE WHEN LOWER(sd.department) LIKE '%is%' THEN sd.id_langfuse_session END) AS DOUBLE)
+        / NULLIF(COUNT(DISTINCT sd.id_langfuse_session), 0), 4) AS escalation_is_rate
+FROM session_dim sd
 GROUP BY 1, 2
 ORDER BY 1 DESC
 ```
