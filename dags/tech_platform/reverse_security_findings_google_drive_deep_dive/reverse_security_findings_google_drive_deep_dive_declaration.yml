@@ -1,0 +1,30 @@
+dag:
+  name: reverse_security_findings_google_drive_deep_dive
+  schedule_start_date: 2026, 9, 21
+  owner: Tech Platform Cyber Security
+  documentation:
+    dag_purpose: |
+      Publishes the Security Data Gateway Google Drive findings deep-dive snapshot
+      (schema_version 1, CORESEC-73) for the Base44 dashboard's Deep dive tab. Runs the
+      allowlisted aggregate query
+      against datalake_security_data_gateway_clean.security_findings — KPI counts and
+      MIME-type/shared-drive/external-grantee/org-unit/PII-combination/exposure-matrix
+      breakdowns, plus two Privacy-approved raw-email panels (top_external_users,
+      top_owners — internal/partner Workspace accounts, not customer PII). No resource
+      ids, names, or raw payloads anywhere — and overwrites
+      s3://5a-base44-office/security_data_gateway/executive_summary/google_drive_deep_dive.json.
+      No cron schedule: triggered automatically via dependencies.yaml lineage as soon
+      as the upstream security_data_gateway_findings DAG finishes its clean-layer load,
+      same trigger as reverse_security_findings_executive_summary. Shares that DAG's
+      S3 prefix, so no new IAM grant is needed.
+workflow:
+  type: load_access
+  layer: reverse
+  custom_schema: security_findings_google_drive_deep_dive
+  load_spark_job: load_google_drive_deep_dive_to_s3
+  spark_job_arguments:
+    - "{environment}"
+    - "{{ data_interval_start | ds }}"
+  execution_timeout_hours: 1
+  tables_customization:
+    google_drive_deep_dive: {}

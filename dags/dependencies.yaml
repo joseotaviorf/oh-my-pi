@@ -4926,6 +4926,8 @@ bietlejuice.reverse_sale_unavailable_listings_load:
   - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings:first-run-of-day
 bietlejuice.reverse_security_findings_executive_summary:
   - bietlejuice.security_data_gateway_findings:load-clean-security-findings:first-run-of-day
+bietlejuice.reverse_security_findings_google_drive_deep_dive:
+  - bietlejuice.security_data_gateway_findings:load-clean-security-findings:first-run-of-day
 bietlejuice.reverse_supply:
   - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking:first-run-of-day
   - bietlejuice.dw_supply:load-dw-growth-dim-funnel-step:first-run-of-day

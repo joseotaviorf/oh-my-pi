@@ -79,6 +79,7 @@ dags_out_of_pattern:
         "reverse_neighborhood_price_range_access",
         "reverse_integration_cloudzero",
         "reverse_security_findings_executive_summary",
+        "reverse_security_findings_google_drive_deep_dive",
         "reverse_listings_locations_load",
         "reverse_listings_locations_access",
         "reverse_reports",
@@ -93,6 +94,13 @@ dags_out_of_pattern:
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks
 dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
+# EMR jobs never get the `dags` package on sys.path, so ConfigurationService
+# can't resolve a per-DAG conf.yml there (Composer/Databricks-only paths) --
+# these keys must live in the shared core conf. Same bucket AND prefix as the
+# executive summary export, just a different file; existing IDPLATF-8284
+# s3:PutObject grant already covers it.
+google_drive_deep_dive_s3_bucket: 5a-base44-office
+google_drive_deep_dive_s3_key: security_data_gateway/executive_summary/google_drive_deep_dive.json
 data_documentation_bucket: data-documentation.s3.data.quintoandar.com.br
 datalake_bucket: 5a-datalake-prod
 profiling_enabled: true

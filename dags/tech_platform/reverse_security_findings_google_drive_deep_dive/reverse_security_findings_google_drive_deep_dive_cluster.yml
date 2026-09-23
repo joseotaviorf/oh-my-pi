@@ -1,0 +1,8 @@
+cluster:
+  type: emr_7_12_consolidation_xs_general_fleet_cluster
+  custom_configurations:
+    spark_conf:
+      # ts_classified is stored as UTC (see clean-layer metadata); pin the session
+      # timezone so date truncation matches Trino's `AT TIME ZONE 'UTC'` semantics
+      # used when this SQL was validated (see production-deep-dive-queries.sql).
+      spark.sql.session.timeZone: UTC
