@@ -178,17 +178,19 @@ columns:
     lineage:
       - datalake_sap_analytics_cloud_raw.allocations.Date
     description:
-      Planning period date the allocation line refers to, used to align allocated costs
-      with the corresponding accounting month.
+      Planning period the allocation line refers to, used to align allocated costs with
+      the corresponding accounting month. The source dimension is monthly, so the date
+      is always the first day of that month.
   year:
     lineage:
       - datalake_sap_analytics_cloud_raw.allocations.year
-    description: Year partition derived from the ingestion date for incremental loading.
+    description:
+      Year partition, taken from the accounting month the allocation belongs to rather
+      than from the date it was ingested.
   month:
     lineage:
       - datalake_sap_analytics_cloud_raw.allocations.month
-    description: Month partition derived from the ingestion date for incremental loading.
-  day:
-    lineage:
-      - datalake_sap_analytics_cloud_raw.allocations.day
-    description: Day partition derived from the ingestion date for incremental loading.
+    description:
+      Month partition, taken from the accounting month the allocation belongs to rather
+      than from the date it was ingested. Each run loads one month, and reloading a
+      month replaces only its own partition.

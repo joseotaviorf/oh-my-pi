@@ -1,6 +1,3 @@
--- TODO: confirm the date format returned by the SAC OData export. TO_DATE below
--- assumes ISO (yyyy-MM-dd); if SAC returns yyyyMMdd, add the explicit pattern as
--- done in datalake_sap_4hana_clean.journal_entries.
 SELECT
     NULLIF(DIM_Allocation, '') AS id_allocation,
     NULLIF(DIM_AllocationLine, '') AS id_allocation_line,
@@ -30,11 +27,15 @@ SELECT
     K_TEMP_DRIVER AS temp_driver_amount,
     K_HSL AS hsl_amount,
     K_ML1 AS ml1_amount,
-    TO_DATE(`Date`) AS dt_allocation,
+    -- The model's date dimension is monthly and arrives as YYYYMM, so the
+    -- pattern is explicit and the resulting date is the first of the month.
+    TO_DATE(`Date`, 'yyyyMM') AS dt_allocation,
     year,
-    month,
-    day
+    month
 FROM
     datalake_sap_analytics_cloud_raw.allocations
 WHERE
-    MAKE_DATE(year, month, day) = '{load_end_date}'
+    -- The raw layer is partitioned by the month the data belongs to, and each
+    -- run loads one month, so the clean load reads that same month's partition.
+    year = YEAR(TO_DATE('{load_end_date}'))
+    AND month = MONTH(TO_DATE('{load_end_date}'))

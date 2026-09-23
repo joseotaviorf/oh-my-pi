@@ -7,6 +7,12 @@ dag:
     dag_purpose: |
       Ingestion of SAP Analytics Cloud (SAC) planning and reporting data via the SAC API,
       landing the raw payload and exposing a normalized clean layer for controllership use.
+
+      Each run loads a single accounting month, filtered at the API, and writes it to that
+      month's partition. The unfiltered export moves at roughly 0.9 MB/s, so pulling the
+      whole model did not finish within two hours, while one month takes about 25 minutes.
+      The daily schedule therefore keeps refreshing the current month; earlier months are
+      loaded by backfilling this DAG over their dates, one month per run.
 workflow:
   layer: raw
   type: custom_ingestion
@@ -22,7 +28,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     allocations:
-      extraction_type: full
-      partitions: ["year", "month", "day"]
+      extraction_type: incremental
+      partitions: ["year", "month"]
       extra_spark_job_arguments:
       - table_api_path: "api/v1/dataexport/providers/sac/Cvocdn23av1lgcbskqikj76rs38/FactData"

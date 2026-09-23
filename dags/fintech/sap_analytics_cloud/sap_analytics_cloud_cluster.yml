@@ -5,14 +5,14 @@ cluster:
       package: numpy==1.26.4
   - pypi:
       package: pyarrow==15.0.2
-  # The SAC export is a full load: every run fetches the whole model. The EMR
-  # preset defaults to dynamic partitionOverwriteMode, which would replace only
-  # the current year/month/day partition and leave every prior run's full copy
-  # behind, so unfiltered reads would count the same rows once per run day.
-  # Static makes overwrite replace all partitions. The raw job verifies this
-  # setting at runtime before writing.
+  # The SAC export is loaded one month per run, partitioned by the month the
+  # data belongs to. Dynamic partitionOverwriteMode scopes the overwrite to
+  # that month, which is what lets months accumulate and lets any single month
+  # be reloaded without touching the others. Static would replace the whole
+  # table on every run, leaving only the month that ran last. The raw job
+  # verifies this setting at runtime before writing.
   custom_configurations:
     spark_conf:
-      spark.sql.sources.partitionOverwriteMode: static
+      spark.sql.sources.partitionOverwriteMode: dynamic
     aws_attributes:
       ebs_volume_size: 200

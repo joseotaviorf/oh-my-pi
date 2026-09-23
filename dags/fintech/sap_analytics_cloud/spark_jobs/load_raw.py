@@ -6,26 +6,24 @@ import ssl
 import time
 from argparse import ArgumentParser
 from datetime import datetime
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 import boto3
 import requests
 from botocore.exceptions import ClientError
+from pyspark.sql.functions import lit
 from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import (
-    SparkDataFrameService,
-    SparkTableStorageFormat,
-)
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.validation.spark_args import (
     add_validation_target_args,
     resolve_datalake_write_target,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.pipeline import FullTableLoaderPipeline
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import MetastoreServiceFactory
 from bietlejuice.services.storage_services.s3_service import S3Service
@@ -39,6 +37,13 @@ REQUEST_RETRY_BACKOFF_SECONDS = 10
 
 # Scratch area for the raw export; cleared before staging and after the load.
 STAGING_PREFIX = "tmp/api_ingestion"
+
+# The model's date dimension, at monthly grain and formatted as YYYYMM. One
+# month is one block of this load: the unfiltered export moves at roughly
+# 0.9 MB/s, so pulling the whole model took over two hours and never finished,
+# while a single month is about 1.2 GiB and lands in around 25 minutes.
+DATE_DIMENSION = "Date"
+DATE_DIMENSION_FORMAT = "%Y%m"
 
 HTTPS_PORT = 443
 EGRESS_PROBE_TIMEOUT_SECONDS = 10
@@ -231,11 +236,12 @@ def _tenant_base_url(odata_url):
     return f"{parts.scheme}://{parts.netloc}"
 
 
-def _staging_path(*, datalake_bucket, source, table_name, load_end_date):
-    """Where the raw export lands before Spark reads it."""
-    return (
-        f"s3://{datalake_bucket}/{STAGING_PREFIX}/{source}/{table_name}/{load_end_date}"
-    )
+def _staging_path(*, datalake_bucket, source, table_name, month):
+    """Where the raw export lands before Spark reads it.
+
+    Keyed by month so two months staged at once cannot read each other's pages.
+    """
+    return f"s3://{datalake_bucket}/{STAGING_PREFIX}/{source}/{table_name}/{month}"
 
 
 def _clear_staging(s3_resource, staging_path):
@@ -243,8 +249,8 @@ def _clear_staging(s3_resource, staging_path):
 
     The task is retried, and a retry that finds pages from the attempt that
     died would read them on top of the ones it writes and load the overlap
-    twice. The prefix is scoped to one table and one snapshot date, so nothing
-    else can live under it.
+    twice. The prefix is scoped to one table and one month, so nothing else can
+    live under it.
     """
     parts = urlsplit(staging_path)
     s3_resource.Bucket(parts.netloc).objects.filter(
@@ -253,19 +259,31 @@ def _clear_staging(s3_resource, staging_path):
 
 
 def _stage_export(
-    *, odata_url, table_api_path, access_token, staging_path, storage_service
+    *,
+    odata_url,
+    table_api_path,
+    access_token,
+    target_month,
+    staging_path,
+    storage_service,
 ):
-    """Stream the export into ``staging_path``, one object per page.
+    """Stream one month of the export into ``staging_path``, one object per page.
 
-    Collecting the whole export into a Python list is what killed the previous
+    Collecting the whole export into a Python list is what killed an earlier
     run: the driver reached roughly 17 GB resident and the kernel took the
     process down with no traceback. Writing each page out and dropping it keeps
     driver memory bounded by a single page, and lets Spark read the result in
     parallel instead of materialising it on the driver.
 
+    The month is filtered by the API rather than here, so the request only
+    transfers the block being loaded.
+
     Returns the number of rows staged and every column seen across the export.
     """
-    url = f"{_tenant_base_url(odata_url)}/{table_api_path.lstrip('/')}"
+    query = urlencode(
+        {"$format": "JSON", "$filter": f"{DATE_DIMENSION} eq '{target_month}'"}
+    )
+    url = f"{_tenant_base_url(odata_url)}/{table_api_path.lstrip('/')}?{query}"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Accept": "application/json",
@@ -294,17 +312,23 @@ def _stage_export(
             # the export omits null properties, so a column that happens to be
             # null throughout the first page is absent there and present later.
             exported_columns.update(*(row.keys() for row in rows))
+            # Checked per page, not once the export finishes. An unfiltered
+            # export pages for many hours, so a check that waits for the last
+            # page cannot report the wasted transfer until it is already spent.
+            _raise_unless_month_is_isolated(
+                {row.get(DATE_DIMENSION) for row in rows}, target_month
+            )
 
             storage_service.upload_file(
                 "\n".join(json.dumps(row) for row in rows),
                 f"{staging_path}/page_{pages:06d}.json",
             )
             row_count += len(rows)
-            # The previous run spent 27 minutes paging without emitting a
-            # single line, so a stuck export looked exactly like a slow one.
+            # An earlier run spent 27 minutes paging without emitting a single
+            # line, so a stuck export looked exactly like a slow one.
             logger.info(
-                f"m=_stage_export, pages={pages}, rows={row_count}, "
-                f"msg=Staged a page of the SAC export."
+                f"m=_stage_export, month={target_month}, pages={pages}, "
+                f"rows={row_count}, msg=Staged a page of the SAC export."
             )
 
         # Every page must be followed before the export is considered complete:
@@ -332,35 +356,56 @@ def _raise_if_schema_diverges(exported_columns, table_schema):
         )
 
 
-def _raise_if_export_is_empty(row_count):
-    """Refuse to publish an empty export.
+def _raise_if_export_is_empty(row_count, target_month):
+    """Refuse to publish an empty month.
 
-    The load overwrites the table, so writing an empty export would replace a
-    good snapshot with nothing.
+    The load overwrites the month's partition, so writing an empty export would
+    replace good data with nothing.
     """
     if not row_count:
         raise RuntimeError(
-            "The SAP Analytics Cloud export returned no rows. Refusing to "
-            "overwrite the existing snapshot with an empty full load."
+            f"The SAP Analytics Cloud export returned no rows for {target_month}. "
+            "Refusing to overwrite that month's partition with an empty load."
         )
 
 
-def _raise_unless_partition_overwrite_is_static(spark):
-    """Refuse to write unless overwrite replaces every partition.
+def _raise_unless_month_is_isolated(page_months, target_month):
+    """Fail when a page carries any month other than the requested one.
 
-    The run writes the whole model into the current year/month/day partition.
-    Under the EMR preset default (dynamic) that leaves each earlier run's full
-    copy in place, so an unfiltered read returns one duplicate snapshot per run
-    day. The cluster pins static (see sap_analytics_cloud_cluster.yml); this
-    check keeps the load from silently degrading if that override is dropped.
+    The month is filtered by the API and nothing downstream re-checks it. If
+    that filter were ignored the run would pull the whole model and write every
+    month of it into the target month's partition, which reads as a plausible
+    month of data rather than as a failure.
+    """
+    unexpected = sorted(month for month in page_months if month != target_month)
+
+    if unexpected:
+        raise RuntimeError(
+            f"The export for {target_month} also carries {len(unexpected)} other "
+            f"month(s): {unexpected[:12]}. The API did not honour the "
+            f"{DATE_DIMENSION} filter; stopping before the whole model is "
+            f"transferred and written into the {target_month} partition."
+        )
+
+
+def _raise_unless_partition_overwrite_is_dynamic(spark):
+    """Refuse to write unless overwrite is scoped to the month being loaded.
+
+    The run writes a single month, partitioned by that month. Under 'static'
+    the overwrite would replace the whole table, so each month block would
+    erase the ones loaded before it and the table would only ever hold the
+    month that ran last. The cluster pins dynamic (see
+    sap_analytics_cloud_cluster.yml); this check keeps the load from silently
+    destroying history if that override is dropped.
     """
     mode = spark.conf.get(PARTITION_OVERWRITE_MODE_KEY, None)
 
-    if mode is None or str(mode).strip().lower() != "static":
+    if mode is None or str(mode).strip().lower() != "dynamic":
         raise RuntimeError(
-            f"{PARTITION_OVERWRITE_MODE_KEY}={mode!r}. This full load needs "
-            "'static' so the overwrite replaces every partition instead of "
-            "accumulating one full snapshot per run day; refusing to write. "
+            f"{PARTITION_OVERWRITE_MODE_KEY}={mode!r}. This monthly load needs "
+            "'dynamic' so the overwrite replaces only the month being loaded "
+            "instead of erasing every month already in the table; refusing to "
+            "write. "
             "See sap_analytics_cloud_cluster.yml."
         )
 
@@ -408,7 +453,12 @@ if __name__ == "__main__":
     access_token = _get_access_token(credentials)
     odata_url = credentials["odata_url"]
 
-    snapshot_dt = datetime.strptime(load_end_date, "%Y-%m-%d")
+    # The month being loaded comes from the run's own date, so the daily
+    # schedule keeps refreshing the current month and an Airflow backfill over
+    # past dates is all a regressive month-by-month ingestion needs.
+    target_month = datetime.strptime(load_end_date, "%Y-%m-%d").strftime(
+        DATE_DIMENSION_FORMAT
+    )
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
 
@@ -427,14 +477,14 @@ if __name__ == "__main__":
     )
     metastore_service.create_database(write_database_name)
 
-    _raise_unless_partition_overwrite_is_static(spark_client.conn)
+    _raise_unless_partition_overwrite_is_dynamic(spark_client.conn)
 
     s3_resource = boto3.resource("s3")
     staging_path = _staging_path(
         datalake_bucket=datalake_bucket,
         source=source,
         table_name=table_name,
-        load_end_date=load_end_date,
+        month=target_month,
     )
 
     _clear_staging(s3_resource, staging_path)
@@ -442,10 +492,11 @@ if __name__ == "__main__":
         odata_url=odata_url,
         table_api_path=table_api_path,
         access_token=access_token,
+        target_month=target_month,
         staging_path=staging_path,
         storage_service=S3Service(s3_resource),
     )
-    _raise_if_export_is_empty(row_count)
+    _raise_if_export_is_empty(row_count, target_month)
     _raise_if_schema_diverges(exported_columns, table_schema)
 
     # The schema is declared rather than inferred: inference would sample the
@@ -458,14 +509,16 @@ if __name__ == "__main__":
         .option("mode", "FAILFAST")
         .json(staging_path)
     )
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(snapshot_dt)
-        .output()
+    # Partitioned by the month the data belongs to, not by the day it was
+    # loaded, so a month always lands in the same partition however many times
+    # it is reloaded. Literals rather than values derived from the rows: every
+    # row was just checked to carry target_month, so this writes exactly one
+    # partition and the dynamic overwrite cannot reach another month.
+    df = df.withColumn("year", lit(int(target_month[:4]))).withColumn(
+        "month", lit(int(target_month[4:]))
     )
 
-    FullTableLoaderPipeline(
+    IncrementalTableLoaderPipeline(
         database_name=write_database_name,
         table_name=write_table_name,
         database_location=write_location,
@@ -480,8 +533,8 @@ if __name__ == "__main__":
     _clear_staging(s3_resource, staging_path)
 
     logger.info(
-        "m=load_raw, snapshot_dt=%s, rows=%s, msg=SAP Analytics Cloud raw full load "
+        "m=load_raw, month=%s, rows=%s, msg=SAP Analytics Cloud raw monthly load "
         "completed successfully.",
-        load_end_date,
+        target_month,
         row_count,
     )
