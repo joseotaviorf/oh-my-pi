@@ -27,6 +27,7 @@ teams_config:
   agents_supply_acquisition:
     de_types:
       - send
+      - return
 
 cluster:
   type: emr_7_12_small_general_2xlarge_single_node_cluster
