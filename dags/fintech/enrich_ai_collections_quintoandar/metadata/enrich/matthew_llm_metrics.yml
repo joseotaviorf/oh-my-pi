@@ -15,11 +15,11 @@ columns:
   matthew_host_model:
     lineage:
       - datalake_langfuse_clean.observations.provided_model_name
-    description: "Raw LLM model name from the first Host - HostPlanner GENERATION in the session (ChatOpenAI or NormalizedChatOpenAI child). NULL for Matthew-in-Chat sessions (Wall-e host) or when no host planner call was recorded. Use matthew_host_version for the V1/V2 experiment tag."
+    description: "Raw LLM model name from the first Host - HostPlanner GENERATION in the session (ChatOpenAI or NormalizedChatOpenAI child). NULL for Matthew-in-Chat sessions (Wall-e host) or when no host planner call was recorded. Use matthew_host_version for the V2/V3 experiment tag."
   matthew_host_version:
     lineage:
       - datalake_langfuse_clean.observations.provided_model_name
-    description: "Matthew WhatsApp host planner version tag derived from the first Host - HostPlanner GENERATION in the session: V1 when matthew_host_model is openai/gpt-4o-2024-11-20, V2 when openai/gpt-5.6-luna. NULL for other models, Matthew-in-Chat (Wall-e host), or when no host planner call exists. Distinct from matthew_version (collections-agent architecture) and matthew_model (collections-agent LLM)."
+    description: "Matthew WhatsApp host planner version tag derived from the first Host - HostPlanner GENERATION in the session: V2 when matthew_host_model is openai/gpt-4o-2024-11-20, V3 when openai/gpt-5.6-luna. NULL for other models, Matthew-in-Chat (Wall-e host), or when no host planner call exists. Distinct from matthew_version (collections-agent architecture) and matthew_model (collections-agent LLM)."
   n_agent_messages:
     lineage:
       - datalake_langfuse_clean.observations.name

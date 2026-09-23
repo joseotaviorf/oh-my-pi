@@ -184,8 +184,8 @@ session_host AS (
         id_langfuse_session,
         matthew_host_model,
         CASE
-            WHEN matthew_host_model = 'openai/gpt-4o-2024-11-20' THEN 'V1'
-            WHEN matthew_host_model = 'openai/gpt-5.6-luna' THEN 'V2'
+            WHEN matthew_host_model = 'openai/gpt-4o-2024-11-20' THEN 'V2'
+            WHEN matthew_host_model = 'openai/gpt-5.6-luna' THEN 'V3'
             ELSE NULL
         END AS matthew_host_version
     FROM

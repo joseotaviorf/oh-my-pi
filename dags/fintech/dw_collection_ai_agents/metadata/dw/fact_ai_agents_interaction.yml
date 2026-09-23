@@ -331,7 +331,7 @@ columns:
   matthew_host_version:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_llm_metrics.matthew_host_version
-    description: "Matthew WhatsApp host planner version tag from the first Host - HostPlanner GENERATION in the session: V1 for openai/gpt-4o-2024-11-20, V2 for openai/gpt-5.6-luna. NULL for other host models, Matthew-in-Chat (Wall-e host), or when no host planner call exists. Distinct from matthew_version (collections-agent architecture) and matthew_model (collections-agent LLM)."
+    description: "Matthew WhatsApp host planner version tag from the first Host - HostPlanner GENERATION in the session: V2 for openai/gpt-4o-2024-11-20, V3 for openai/gpt-5.6-luna. NULL for other host models, Matthew-in-Chat (Wall-e host), or when no host planner call exists. Distinct from matthew_version (collections-agent architecture) and matthew_model (collections-agent LLM)."
   n_agent_messages:
     lineage:
       - datalake_ai_collections_quintoandar.matthew_llm_metrics.n_agent_messages
