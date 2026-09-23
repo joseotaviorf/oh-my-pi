@@ -301,6 +301,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Flag indicating if the search page view event has QAC results available in the search region (nbr_search_classifieds > 0).
+  up_is_mora_enabled_on_app:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Value of the isMoraEnabledOnApp user property at event time, indicating whether Mora was enabled on the user's app. NULL when the property is absent or not a boolean. Lets consumers segment by Mora availability without parsing user_properties.
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
 description: This table contains search_page_viewed events from app 170698. It tracks

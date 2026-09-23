@@ -74,7 +74,11 @@ SELECT
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_aluguel') AS BIGINT) AS rent_value,
     CAST(COALESCE(GET_JSON_OBJECT(event_properties, '$.valor_condominio'), GET_JSON_OBJECT(event_properties, '$.valor_condomínio')) AS BIGINT) AS condo_value,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_total') AS BIGINT) AS total_value,
-    CAST(GET_JSON_OBJECT(event_properties, '$.valor_venda') AS BIGINT) AS sale_value
+    CAST(GET_JSON_OBJECT(event_properties, '$.valor_venda') AS BIGINT) AS sale_value,
+    CASE GET_JSON_OBJECT(user_properties, '$.isMoraEnabledOnApp')
+        WHEN 'true' THEN TRUE
+        WHEN 'false' THEN FALSE
+    END AS up_is_mora_enabled_on_app
 FROM
     datalake_amplitude_events_clean.events
 WHERE

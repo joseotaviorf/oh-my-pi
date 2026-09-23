@@ -78,6 +78,10 @@ SELECT
         WHEN nbr_search_classifieds > 0 THEN True 
         ELSE False 
     END AS is_qac_region,
+    CASE GET_JSON_OBJECT(user_properties, '$.isMoraEnabledOnApp')
+        WHEN 'true' THEN TRUE
+        WHEN 'false' THEN FALSE
+    END AS up_is_mora_enabled_on_app,
     is_paying,
     is_attribution_event,
     ts_server_received,

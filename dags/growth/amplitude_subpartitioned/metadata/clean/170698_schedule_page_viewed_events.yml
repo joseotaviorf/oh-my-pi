@@ -310,3 +310,7 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.sale_value
     description: Analytics field 'sale_value' materialized in this Amplitude subpartition for Growth funnel and attribution reporting.
+  up_is_mora_enabled_on_app:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Value of the isMoraEnabledOnApp user property at event time, indicating whether Mora was enabled on the user's app. NULL when the property is absent or not a boolean. Lets consumers segment by Mora availability without parsing user_properties.

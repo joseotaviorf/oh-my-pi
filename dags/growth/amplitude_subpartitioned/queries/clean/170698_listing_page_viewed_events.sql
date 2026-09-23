@@ -24,6 +24,10 @@ SELECT
     CAST(GET_JSON_OBJECT(event_properties, '$.uri') AS STRING) AS uri,
     COALESCE(CAST(GET_JSON_OBJECT(event_properties, '$.is_qac') AS BOOLEAN), FALSE) AS is_qac,
     is_qac AS is_qac_region,
+    CASE GET_JSON_OBJECT(user_properties, '$.isMoraEnabledOnApp')
+        WHEN 'true' THEN TRUE
+        WHEN 'false' THEN FALSE
+    END AS up_is_mora_enabled_on_app,
     GET_JSON_OBJECT(event_properties, '$.visit_status') AS visit_status,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_aluguel') AS BIGINT) AS rent_value,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_condominio') AS BIGINT) AS condo_value,
