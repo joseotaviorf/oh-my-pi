@@ -14,7 +14,10 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interf
 )
 from bietlejuice.base.airflow.enums.criticality_enum import (
     CRITICALITY_TAG_PREFIX,
+    DEFAULT_FRESHNESS_ACTIVE_WINDOW,
     EFFECTIVE_TIER_TAG_PREFIX,
+    FRESHNESS_ACTIVE_WINDOW_TAG_PREFIX,
+    FRESHNESS_MAX_STALENESS_TAG_PREFIX,
     SLA_DEADLINE_TAG_PREFIX,
     CriticalityEnum,
 )
@@ -122,13 +125,28 @@ class BaseWorkflow(BuilderInterface):
             declared_criticality = self.dag_args.get("criticality")
             if declared_criticality:
                 dag_tags.append(f"{CRITICALITY_TAG_PREFIX}{declared_criticality}")
-            sla_deadline_localtime = self.dag_args.get("sla_deadline_localtime") or (
-                CriticalityEnum.default_deadline(declared_criticality)
-                if declared_criticality
-                else None
+            freshness_max_staleness_minutes = self.dag_args.get(
+                "freshness_max_staleness_minutes"
             )
-            if sla_deadline_localtime:
-                dag_tags.append(f"{SLA_DEADLINE_TAG_PREFIX}{sla_deadline_localtime}")
+            if freshness_max_staleness_minutes:
+                dag_tags.append(
+                    f"{FRESHNESS_MAX_STALENESS_TAG_PREFIX}{freshness_max_staleness_minutes}"
+                )
+                dag_tags.append(
+                    f"{FRESHNESS_ACTIVE_WINDOW_TAG_PREFIX}{self.dag_args.get('freshness_active_window_localtime') or DEFAULT_FRESHNESS_ACTIVE_WINDOW}"
+                )
+            else:
+                sla_deadline_localtime = self.dag_args.get(
+                    "sla_deadline_localtime"
+                ) or (
+                    CriticalityEnum.default_deadline(declared_criticality)
+                    if declared_criticality
+                    else None
+                )
+                if sla_deadline_localtime:
+                    dag_tags.append(
+                        f"{SLA_DEADLINE_TAG_PREFIX}{sla_deadline_localtime}"
+                    )
             effective_tier = CriticalityEnum.highest(
                 [self.dag_args.get("criticality")]
                 + [

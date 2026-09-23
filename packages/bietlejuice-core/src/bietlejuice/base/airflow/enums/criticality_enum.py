@@ -65,3 +65,9 @@ SLA_DEADLINE_TAG_PREFIX = "sla_deadline_localtime:"
 # would match inside a tag such as effective_criticality:Critical.
 EFFECTIVE_TIER_TAG_PREFIX = "effective_tier:"
 SLA_DEADLINE_PATTERN = r"^([01]\d|2[0-3]):[0-5]\d$"
+FRESHNESS_MAX_STALENESS_TAG_PREFIX = "freshness_max_staleness_minutes:"
+FRESHNESS_ACTIVE_WINDOW_TAG_PREFIX = "freshness_active_window_localtime:"
+FRESHNESS_ACTIVE_WINDOW_PATTERN = (
+    r"^([01]\d|2[0-3]):[0-5]\d-(([01]\d|2[0-3]):[0-5]\d|24:00)$"
+)
+DEFAULT_FRESHNESS_ACTIVE_WINDOW = "00:00-24:00"

@@ -58,3 +58,28 @@ class TestBaseWorkflowSlaDeadlineTag:
     def test_dag_without_criticality_gets_no_deadline_tag(self, workflow_factory):
         tags = workflow_factory().tags
         assert not [tag for tag in tags if tag.startswith("sla_deadline_localtime:")]
+
+
+class TestBaseWorkflowSlaFreshnessTags:
+    def test_freshness_dag_with_declared_window_gets_freshness_tags_and_no_deadline_tag(
+        self, workflow_factory
+    ):
+        tags = workflow_factory(
+            criticality="High",
+            freshness_max_staleness_minutes=90,
+            freshness_active_window_localtime="06:00-22:00",
+        ).tags
+        assert "freshness_max_staleness_minutes:90" in tags
+        assert "freshness_active_window_localtime:06:00-22:00" in tags
+        assert not [tag for tag in tags if tag.startswith("sla_deadline_localtime:")]
+
+    def test_freshness_dag_without_declared_window_gets_default_window(
+        self, workflow_factory
+    ):
+        tags = workflow_factory(
+            criticality="High",
+            freshness_max_staleness_minutes=90,
+        ).tags
+        assert "freshness_max_staleness_minutes:90" in tags
+        assert "freshness_active_window_localtime:00:00-24:00" in tags
+        assert not [tag for tag in tags if tag.startswith("sla_deadline_localtime:")]

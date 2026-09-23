@@ -763,6 +763,38 @@ class TestTableAttributesCriticality:
         )
         assert table_attributes.criticality == CriticalityEnum.HIGH
 
+    def test_criticality_fast_lane_dag_with_freshness_and_clean_table_critical_returns_critical(
+        self,
+    ):
+        table_attributes = TableAttributes(
+            dag_args={
+                "name": "retsuko_fast_lane",
+                "criticality": "High",
+                "freshness_max_staleness_minutes": 150,
+            },
+            workflow_args={},
+            layer=LayerEnum.CLEAN,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.CRITICAL
+
+    def test_criticality_fast_lane_dag_with_freshness_and_raw_table_critical_returns_high(
+        self,
+    ):
+        table_attributes = TableAttributes(
+            dag_args={
+                "name": "retsuko_fast_lane",
+                "criticality": "High",
+                "freshness_max_staleness_minutes": 150,
+            },
+            workflow_args={},
+            layer=LayerEnum.RAW,
+            table_name="entry",
+            table_customization={"criticality": "Critical"},
+        )
+        assert table_attributes.criticality == CriticalityEnum.HIGH
+
     def test_criticality_raw_layer_with_table_critical_and_dag_medium_returns_medium(
         self,
     ):

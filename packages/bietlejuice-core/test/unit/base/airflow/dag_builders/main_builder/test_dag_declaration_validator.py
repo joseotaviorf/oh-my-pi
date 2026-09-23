@@ -1191,7 +1191,7 @@ class TestDAGDeclarationValidatorCriticality:
         }
         with pytest.raises(
             AssertionError,
-            match=r"cannot declare criticality: Critical \(found on \['dag'\]\)",
+            match=r"declares criticality: Critical \(found on \['dag'\]\) without freshness_max_staleness_minutes",
         ):
             dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
@@ -1212,7 +1212,7 @@ class TestDAGDeclarationValidatorCriticality:
         }
         with pytest.raises(
             AssertionError,
-            match=r"cannot declare criticality: Critical \(found on \['account'\]\)",
+            match=r"declares criticality: Critical \(found on \['account'\]\) without freshness_max_staleness_minutes",
         ):
             dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
@@ -1232,3 +1232,143 @@ class TestDAGDeclarationValidatorCriticality:
         assert (
             dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
         )
+
+    def test_validate_fast_lane_critical_table_with_staleness_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {"account": {"criticality": "Critical"}},
+            },
+            "dag": {
+                "name": "retsuko_fast_lane",
+                "owner": "Data Engineering",
+                "criticality": "High",
+                "freshness_max_staleness_minutes": 90,
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_freshness_window_without_staleness_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_active_window_localtime": "08:00-18:00",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match="without freshness_max_staleness_minutes",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_freshness_with_dag_sla_deadline_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_max_staleness_minutes": 60,
+                "sla_deadline_localtime": "08:00",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot also declare sla_deadline_localtime \(found on \['dag'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_freshness_with_table_sla_deadline_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {
+                    "dim_user": {"sla_deadline_localtime": "08:00"}
+                },
+            },
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_max_staleness_minutes": 60,
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot also declare sla_deadline_localtime \(found on \['dim_user'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_freshness_active_window_inverted_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_max_staleness_minutes": 60,
+                "freshness_active_window_localtime": "22:00-06:00",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match="must start before it ends",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_freshness_active_window_invalid_regex_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_active_window_localtime": "06:00-25:00",
+            },
+        }
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_freshness_active_window_valid_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_max_staleness_minutes": 60,
+                "freshness_active_window_localtime": "00:00-24:00",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_freshness_max_staleness_zero_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "freshness_max_staleness_minutes": 0,
+            },
+        }
+        with pytest.raises(AssertionError):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)

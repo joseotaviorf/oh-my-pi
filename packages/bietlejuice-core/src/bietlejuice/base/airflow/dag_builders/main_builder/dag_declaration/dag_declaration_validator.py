@@ -18,6 +18,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum 
 )
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.enums.criticality_enum import (
+    FRESHNESS_ACTIVE_WINDOW_PATTERN,
     SLA_DEADLINE_PATTERN,
     CriticalityEnum,
 )
@@ -71,6 +72,17 @@ class DAGDeclarationValidator(Validator):
                     "type": "string",
                     "required": False,
                     "regex": SLA_DEADLINE_PATTERN,
+                },
+                "freshness_max_staleness_minutes": {
+                    "type": "integer",
+                    "required": False,
+                    "min": 1,
+                    "max": 1440,
+                },
+                "freshness_active_window_localtime": {
+                    "type": "string",
+                    "required": False,
+                    "regex": FRESHNESS_ACTIVE_WINDOW_PATTERN,
                 },
             },
         },
@@ -733,7 +745,7 @@ class DAGDeclarationValidator(Validator):
             )
 
         self._check_transformation_grade(dag_declaration)
-        self._check_fast_lane_criticality(dag_declaration)
+        self._check_sla_declaration(dag_declaration)
         self._check_cluster_validation_config(dag_declaration)
         if dag_declaration.get("cluster"):
             self.validate_cluster_validation_cluster_diff(
@@ -752,31 +764,62 @@ class DAGDeclarationValidator(Validator):
         if workflow_type == WorkflowEnum.QUERY_DELTA_WORKFLOW.value:
             self._check_query_delta_rejects_datazord_config(dag_declaration)
 
-    def _check_fast_lane_criticality(self, dag_declaration: dict) -> None:
-        """fast_lane DAGs run intraday, so a daily Critical deadline is meaningless."""
+    def _check_sla_declaration(self, dag_declaration: dict) -> None:
         dag = dag_declaration.get("dag") or {}
         dag_name = dag.get("name") or ""
-        if "fast_lane" not in dag_name:
-            return
-
         tables_customization = (dag_declaration.get("workflow") or {}).get(
             "tables_customization"
         ) or {}
-        offenders = [
-            table_name
-            for table_name, customization in tables_customization.items()
-            if isinstance(customization, dict)
-            and customization.get("criticality") == CriticalityEnum.CRITICAL
-        ]
-        if dag.get("criticality") == CriticalityEnum.CRITICAL:
-            offenders.insert(0, "dag")
-        if offenders:
+
+        staleness = dag.get("freshness_max_staleness_minutes")
+        window = dag.get("freshness_active_window_localtime")
+
+        if window is not None and staleness is None:
             raise AssertionError(
-                "m=_check_fast_lane_criticality, "
-                f"msg=fast_lane DAG '{dag_name}' cannot declare "
-                f"criticality: Critical (found on {offenders}); fast_lane DAGs run "
-                "intraday and may declare at most 'High'"
+                "m=_check_sla_declaration, "
+                f"msg=DAG '{dag_name}' declares freshness_active_window_localtime without freshness_max_staleness_minutes"
             )
+
+        if staleness is not None:
+            offenders = [
+                table_name
+                for table_name, customization in tables_customization.items()
+                if isinstance(customization, dict)
+                and customization.get("sla_deadline_localtime") is not None
+            ]
+            if dag.get("sla_deadline_localtime") is not None:
+                offenders.insert(0, "dag")
+            if offenders:
+                raise AssertionError(
+                    "m=_check_sla_declaration, "
+                    f"msg=DAG '{dag_name}' declares a freshness SLA, so it cannot also declare "
+                    f"sla_deadline_localtime (found on {offenders})"
+                )
+
+        if window is not None and "-" in window:
+            start, end = window.split("-", 1)
+            if start >= end:
+                raise AssertionError(
+                    "m=_check_sla_declaration, "
+                    f"msg=DAG '{dag_name}' freshness_active_window_localtime '{window}' must start before it ends"
+                )
+
+        if "fast_lane" in dag_name and staleness is None:
+            offenders = [
+                table_name
+                for table_name, customization in tables_customization.items()
+                if isinstance(customization, dict)
+                and customization.get("criticality") == CriticalityEnum.CRITICAL
+            ]
+            if dag.get("criticality") == CriticalityEnum.CRITICAL:
+                offenders.insert(0, "dag")
+            if offenders:
+                raise AssertionError(
+                    "m=_check_sla_declaration, "
+                    f"msg=fast_lane DAG '{dag_name}' declares criticality: Critical "
+                    f"(found on {offenders}) without freshness_max_staleness_minutes; "
+                    "intraday DAGs are scored on freshness, so declare a freshness SLA or use at most 'High'"
+                )
 
     def _check_transformation_grade(self, dag_declaration: dict) -> None:
         workflow = dag_declaration.get("workflow") or {}

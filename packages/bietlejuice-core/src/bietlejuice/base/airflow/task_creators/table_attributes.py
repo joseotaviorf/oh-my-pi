@@ -224,7 +224,9 @@ class TableAttributes:
         resolved = CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
         if resolved == CriticalityEnum.CRITICAL:
             dag_name = self._dag_args.get("name", "") if self._dag_args else ""
-            if "fast_lane" in dag_name:
+            if "fast_lane" in dag_name and not (self._dag_args or {}).get(
+                "freshness_max_staleness_minutes"
+            ):
                 return CriticalityEnum.HIGH
 
             if self._is_staging_copy():
