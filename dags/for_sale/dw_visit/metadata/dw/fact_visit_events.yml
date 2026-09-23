@@ -40,14 +40,6 @@ columns:
     lineage:
     - dw_visit.dim_author_type.sk_author_type
     description: Is the key which identifies the author type. Joins with dim_author_type.
-  sk_company_demand:
-    lineage:
-    - datalake_visits.visit_status_events.id_company_demand
-    description: Is the company demand key if applicable.
-  sk_company_supply:
-    lineage:
-    - datalake_visits.visit_status_events.id_company_supply
-    description: Is the company supply key if applicable.
   sk_broker_supply:
     lineage:
     - datalake_visit.visit_status_events.sk_broker_supply

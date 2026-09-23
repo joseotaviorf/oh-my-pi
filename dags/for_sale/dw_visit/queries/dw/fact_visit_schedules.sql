@@ -8,8 +8,6 @@ SELECT
     bc.sk_business_context,
     vm.sk_visit_model,
     svh.id_business_unit AS sk_business_unit,
-    es.id_company_supply AS sk_company_supply,
-    es.id_company_demand AS sk_company_demand,
     COALESCE(es.sk_broker_supply, -1) AS sk_broker_supply,
     COALESCE(es.sk_broker_demand, -1) AS sk_broker_demand,
     es.id_agent AS sk_agent,

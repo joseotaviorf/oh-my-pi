@@ -33,15 +33,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing_status.id_region
     description: Key of region where house listing is located in.
-  sk_company_supply:
-    lineage:
-      - datalake_company.company_sks.sk_company
-    description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
   sk_broker_supply:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: Surrogate key of the 3P broker partner for the same company as sk_company_supply
-      when is_rent_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
+    description: Surrogate key of the 3P broker partner when is_rent_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
   sk_status_end_date:
     lineage:
       - datalake_ebdb_listing.house_listing_status.ts_status_ended

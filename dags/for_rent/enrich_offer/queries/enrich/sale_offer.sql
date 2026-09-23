@@ -1087,9 +1087,7 @@ SELECT DISTINCT
   sk_broker_demand,
   id_company_supply,
   uuid_company_supply,
-  id_company_supply AS sk_company_supply,
   id_company_demand,
-  id_company_demand AS sk_company_demand,
   pendency,
   CASE
     WHEN current_payment_method = 'INSTANT_MORTGAGE'

@@ -67,7 +67,6 @@ SELECT /*+ BROADCAST(brokers) */
   COALESCE(rde.id_region, -1) AS sk_region,
   COALESCE(rde.id_owner, -1) AS sk_owner,
   COALESCE(rde.id_owner_category, -1) AS sk_owner_category,
-  COALESCE(supply_company.sk_company, -1) AS sk_company_supply,
   COALESCE(brokers.sk_broker, '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(rde.ts_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_event_date,
   rde.country_code,
@@ -80,8 +79,5 @@ SELECT /*+ BROADCAST(brokers) */
 FROM datalake_rent_demand_events.rent_demand_events AS rde
 LEFT JOIN rent_flow_type AS rt
   ON rt.id_rent_flow = rde.id_rent_flow
-LEFT JOIN datalake_company.company_sks AS supply_company
-  ON rde.uuid_company IS NOT NULL
-  AND rde.uuid_company = supply_company.uuid_company
 LEFT JOIN brokers
   ON rde.uuid_company = brokers.uuid_company

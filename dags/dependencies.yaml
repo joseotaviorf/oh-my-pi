@@ -768,7 +768,6 @@ bietlejuice.dw_house:
   - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-info-condo-amenities:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-maintenance-condition:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities:first-run-of-day
@@ -835,7 +834,6 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_b2b:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_big_agent:load-enrich-house-listing-consultant:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-house-available-hours:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-fees:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status:first-run-of-day
@@ -984,7 +982,6 @@ bietlejuice.dw_region:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.dw_rent_demand_events:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types:first-run-of-day
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
@@ -1000,7 +997,6 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day
-  - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day

@@ -72,14 +72,6 @@ columns:
     description: House's Id.
     lineage:
     - datalake_visit.visits.id_house_listing
-  sk_company_demand:
-    description: Company ID of the demand-side partner company linked to the visit agent when the business model involves a demand partner.
-    lineage:
-    - datalake_visit.visits.id_company_demand
-  sk_company_supply:
-    description: Company ID of the supply-side partner company linked to the visit house listing when the business model involves a supply partner.
-    lineage:
-    - datalake_visit.visits.id_company_supply
   sk_broker_supply:
     description: Surrogate key of the supply-side broker when the business model implies 3P supply.
     lineage:

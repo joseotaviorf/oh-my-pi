@@ -133,14 +133,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
     description: UUID of the supply partner in the company domain
-  sk_company_supply:
-    lineage:
-      - datalake_visit.visit_business_model.id_company_supply
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
-  sk_company_demand:
-    lineage:
-      - datalake_visit.visit_business_model.id_company_demand
-    description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   id_company_demand:
     lineage:
       - datalake_visit.visit_business_model.id_company_demand

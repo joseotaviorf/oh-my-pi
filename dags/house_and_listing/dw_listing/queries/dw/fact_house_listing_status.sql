@@ -9,7 +9,6 @@ WITH listing_business_context AS (
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
     hls.id_house_listing AS sk_house_listing,
     COALESCE(hls.id_region, -1) AS sk_region,
-    COALESCE(cs_company.sk_company, cs_hubspot.sk_company, cs_tag.sk_company, -1) AS sk_company_supply,
     COALESCE(IF(h.is_rent_3p_supply, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
     COALESCE(CAST(DATE_FORMAT(hls.ts_first_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_first_publication_date,
     COALESCE(CAST(DATE_FORMAT(hls.ts_status_started, "yyyyMMdd") AS BIGINT), -1) AS sk_status_start_date,
@@ -37,23 +36,6 @@ JOIN datalake_ebdb_listing.house h
     ON h.id = hl.id_house
 LEFT JOIN listing_business_context lbc
     ON lbc.id_house = h.id
-LEFT JOIN
-    datalake_company.company_sks AS cs_company
-        ON h.is_rent_3p_supply
-        AND h.uuid_company IS NOT NULL
-        AND h.uuid_company = cs_company.uuid_company
-LEFT JOIN
-    datalake_company.company_sks AS cs_hubspot
-        ON h.is_rent_3p_supply
-        AND h.uuid_company IS NULL
-        AND h.id_company_hubspot IS NOT NULL
-        AND h.id_company_hubspot = cs_hubspot.id_hubspot
-LEFT JOIN
-    datalake_company.company_sks AS cs_tag
-        ON h.is_rent_3p_supply
-        AND h.uuid_company IS NULL
-        AND h.id_company_hubspot IS NULL
-        AND h.partner_3p_supply = cs_tag.extracted_3p_tag
 LEFT JOIN
     core_brokers.brokers AS cb
         ON h.uuid_company = cb.uuid_company

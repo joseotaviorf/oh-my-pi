@@ -77,15 +77,10 @@ columns:
     lineage:
       - dw_public.dim_booking.sk_rent_flow_taxonomy
     description: Key of the rent flow taxonomy related to the rent flow. A rent flow can have none, one or more taxonomies related.
-  sk_company_supply:
-    lineage:
-      - datalake_company.company_sks.sk_company
-    description: Key of the Rede company that owns the house related to the rent flow. Can be joined with dw_rede.dim_company.
   sk_broker_supply:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: Surrogate key of the 3P broker partner for the same company as sk_company_supply
-      when is_rent_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
+    description: Surrogate key of the 3P broker partner when is_rent_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
   sk_house_first_listing_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing

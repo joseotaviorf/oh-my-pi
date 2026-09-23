@@ -137,7 +137,6 @@ SELECT
   COALESCE(m.id_first_advance_payment, -1) AS sk_first_advance_payment,
   COALESCE(m.id_last_advance_payment, -1) AS sk_last_advance_payment,
   COALESCE(rf.id_region, -1) AS sk_region,
-  COALESCE(cs.sk_company, -1) AS sk_company_supply,
   COALESCE(IF(rf.uuid_company IS NOT NULL, cb.sk_broker, NULL), '-1') AS sk_broker_supply,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_event, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_event_date,
   COALESCE(CAST(DATE_FORMAT(m.ts_first_booking_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_first_booking_created_date,
@@ -226,10 +225,6 @@ JOIN
         AND COALESCE(CAST(rf.has_direct_offer_flow AS INT), -1) = COALESCE(CAST(rt.has_direct_offer_flow AS INT), -1)
         AND COALESCE(CAST(rf.has_tta_flow AS INT), -1) = COALESCE(CAST(rt.has_tta_flow AS INT), -1)
         AND IF(c.nbr_contracts_signed > 0, TRUE, FALSE) = COALESCE(rt.had_contract_signed, FALSE)
-LEFT JOIN
-    datalake_company.company_sks AS cs
-        ON rf.uuid_company IS NOT NULL
-        AND rf.uuid_company = cs.uuid_company
 LEFT JOIN
     core_brokers.brokers AS cb
         ON rf.uuid_company = cb.uuid_company

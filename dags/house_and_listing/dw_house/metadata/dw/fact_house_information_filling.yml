@@ -28,14 +28,10 @@ columns:
     description: ID of the region where the house is located.
     lineage:
       - datalake_ebdb_listing.house.id_region
-  sk_company:
-    description: SK of the Rede company that owns the house.
-    lineage:
-      - datalake_company.company_sks.sk_company
   sk_broker:
     description: >
-      Surrogate key of the 3P broker partner for the same company as sk_company,
-      from the Brokers Core Model; '-1' when the company is not in core_brokers.brokers.
+      Surrogate key of the 3P broker partner from the Brokers Core Model;
+      '-1' when the company is not in core_brokers.brokers.
     lineage:
       - core_brokers.brokers.sk_broker
   sk_revision_date:

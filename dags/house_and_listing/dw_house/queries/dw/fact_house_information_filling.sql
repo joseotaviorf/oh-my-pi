@@ -2,14 +2,9 @@ WITH house AS (
     SELECT
         h.id AS sk_house,
         h.id_region,
-        cs_supply.sk_company,
         cb.sk_broker
     FROM
         datalake_ebdb_listing.house AS h
-    LEFT JOIN
-        datalake_company.company_sks AS cs_supply
-            ON h.uuid_company IS NOT NULL
-            AND h.uuid_company = cs_supply.uuid_company
     LEFT JOIN
         core_brokers.brokers AS cb
             ON h.uuid_company = cb.uuid_company
@@ -21,7 +16,6 @@ SELECT
     dhi.sk_information,
     COALESCE(ah.id_user, -1) AS sk_user_revisor,
     COALESCE(h.id_region, -1) AS sk_region,
-    COALESCE(h.sk_company, -1) AS sk_company,
     COALESCE(h.sk_broker, '-1') AS sk_broker,
     COALESCE(BIGINT(DATE_FORMAT(ah.ts_change, 'yyyyMMdd')), -1) AS sk_revision_date,
     COALESCE(BIGINT(DATE_FORMAT(ah.ts_next_change, 'yyyyMMdd')), -1) AS sk_next_revision_date,
