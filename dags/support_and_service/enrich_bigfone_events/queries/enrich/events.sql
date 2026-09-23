@@ -8,7 +8,8 @@ WITH lonely_events AS (
         provider = 'teravoz'
         AND (event_type = 'service.command' OR event_type = 'recording.available')
         AND DATE(ts_created) = DATE('{year}-{month}-{day}')
-    GROUP BY 2
+    GROUP BY
+        GET_JSON_OBJECT(metadata, '$.call_id')
     -- Teravoz can generate 2 events with the same wrong call_id (recording and service)
     HAVING count_call_id <= 2
 )
