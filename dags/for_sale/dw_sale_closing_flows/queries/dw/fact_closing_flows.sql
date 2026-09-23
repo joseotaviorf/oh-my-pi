@@ -1,3 +1,34 @@
+WITH cs_supply_resolved AS (
+  SELECT
+    cf.id_offer,
+    cs.sk_company
+  FROM datalake_sale_closing_flows.closing_flow AS cf
+  INNER JOIN datalake_company.company_sks AS cs
+    ON cf.uuid_company_supply = cs.uuid_company
+  WHERE cf.uuid_company_supply IS NOT NULL
+
+  UNION
+
+  SELECT
+    cf.id_offer,
+    cs.sk_company
+  FROM datalake_sale_closing_flows.closing_flow AS cf
+  INNER JOIN datalake_company.company_sks AS cs
+    ON cf.id_company_supply = cs.id_hubspot
+  WHERE cf.uuid_company_supply IS NULL
+    AND cf.id_company_supply IS NOT NULL
+
+  UNION
+
+  SELECT
+    cf.id_offer,
+    cs.sk_company
+  FROM datalake_sale_closing_flows.closing_flow AS cf
+  INNER JOIN datalake_company.company_sks AS cs
+    ON cf.partner_3p_supply = cs.extracted_3p_tag
+  WHERE cf.uuid_company_supply IS NULL
+    AND cf.id_company_supply IS NULL
+)
 SELECT
   id_offer AS sk_offer,
   id_buyer AS sk_buyer,
@@ -5,6 +36,8 @@ SELECT
   id_house AS sk_house,
   COALESCE(cs_supply.sk_company, -1) AS sk_company_supply,
   COALESCE(cf.id_company_demand, -1) AS sk_company_demand,
+  COALESCE(cb_supply.sk_broker, -1) AS sk_broker_supply,
+  COALESCE(cf.sk_broker_demand, -1) AS sk_broker_demand,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_onboarding_ended,1, 10),'-','') AS BIGINT), -1) AS sk_onboarding_ended_date,
@@ -91,16 +124,8 @@ SELECT
 FROM
     datalake_sale_closing_flows.closing_flow AS cf
 LEFT JOIN
-  datalake_company.company_sks AS cs_supply
-    ON (
-      cf.uuid_company_supply IS NOT NULL
-      AND cf.uuid_company_supply = cs_supply.uuid_company
-    ) OR (
-      cf.uuid_company_supply IS NULL
-      AND cf.id_company_supply IS NOT NULL
-      AND cf.id_company_supply = cs_supply.id_hubspot
-    ) OR (
-       cf.uuid_company_supply IS NULL
-       AND cf.id_company_supply IS NULL
-       AND cf.partner_3p_supply = cs_supply.extracted_3p_tag
-    )
+  cs_supply_resolved AS cs_supply
+    ON cf.id_offer = cs_supply.id_offer
+LEFT JOIN
+  core_brokers.brokers AS cb_supply
+    ON cf.uuid_company_supply = cb_supply.uuid_company

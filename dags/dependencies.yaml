@@ -1074,6 +1074,7 @@ bietlejuice.dw_sale_available_booking_hours:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status:first-run-of-day
   - bietlejuice.enrich_sale_available_booking_hours:load-enrich-weekly-available-booking-hours:first-run-of-day
 bietlejuice.dw_sale_closing_flows:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow:first-run-of-day
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer:first-run-of-day
@@ -3775,6 +3776,7 @@ bietlejuice.enrich_sale_available_booking_hours:
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_booking:load-enrich-house-available-hours:first-run-of-day
 bietlejuice.enrich_sale_closing_flows:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_monopoly:load-enrich-sale:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day

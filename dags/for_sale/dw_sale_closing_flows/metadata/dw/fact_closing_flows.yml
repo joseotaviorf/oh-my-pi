@@ -10,7 +10,8 @@ description: >-
   Financeiro team's official sale-recognition event, the CD/EoP counterpart to the EoF (End of
   Funnel) milestones tracked up through CCV signature in fact_offers. sk_company_supply and
   sk_company_demand identify 3P Rede partner companies on the supply/demand side when
-  applicable.
+  applicable; sk_broker_supply and sk_broker_demand are the canonical replacement keys (see
+  column descriptions) and should be preferred for new joins to dw_brokers.dim_broker.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
 columns:
@@ -38,6 +39,14 @@ columns:
     lineage:
     - datalake_company.company_sks.sk_company
     description: Surrogate key for Rede companies. -1 if it is not a member.
+  sk_broker_supply:
+    lineage:
+    - core_brokers.brokers.sk_broker
+    description: Surrogate key of the 3P broker partner for the same company as sk_company_supply. -1 if not resolved. Canonical replacement for sk_company_supply; prefer joining to dw_brokers.dim_broker.
+  sk_broker_demand:
+    lineage:
+    - core_brokers.brokers.sk_broker
+    description: Surrogate key of the 3P broker partner for the same company as sk_company_demand. -1 if not resolved. Canonical replacement for sk_company_demand; prefer joining to dw_brokers.dim_broker.
   sk_sale_agreement_created_date:
     lineage:
     - datalake_sale_closing_flows.closing_flow.dt_sale_agreement_created

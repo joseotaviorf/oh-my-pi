@@ -44,6 +44,10 @@ columns:
     lineage:
     - datalake_sale_offer.sale_offer.id_company_demand
     description: Id of the demand partner
+  sk_broker_demand:
+    lineage:
+    - core_brokers.brokers.sk_broker
+    description: Surrogate key of the 3P broker partner on the demand side, resolved from the same company UUID as id_company_demand. Canonical replacement for the legacy company_sks-based key; prefer this for joins to core_brokers.brokers/dw_brokers.dim_broker.
   id_closing_specialist:
     lineage:
     - datalake_sale_offer_flows.sale_offer_flows.id_consultant

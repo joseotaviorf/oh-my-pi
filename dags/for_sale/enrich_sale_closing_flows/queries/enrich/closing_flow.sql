@@ -172,6 +172,7 @@ WITH last_method_change AS (
     so.id_company_supply,
     cs.uuid_company AS uuid_company_supply,
     so.id_company_demand,
+    cb_demand.sk_broker AS sk_broker_demand,
     COALESCE('ID_VENDAS_' || sof.id_consultant, 'ID_MONDAY_' || m.id_closing_specialist) AS id_closing_specialist,
     COALESCE('ID_VENDAS_' || sof.id_legal_risk_analyst, 'ID_MONDAY_' || m.id_legal_risk_analyst) AS id_legal_risk_analyst,
     COALESCE('ID_VENDAS_' || sof.id_pre_specialist, 'ID_MONDAY_' || m.id_pre_specialist) AS id_pre_specialist,
@@ -251,6 +252,8 @@ WITH last_method_change AS (
     ON so.id_company_supply = cs.sk_company
   LEFT JOIN datalake_company.company_sks AS cd
     ON so.id_company_demand = cd.sk_company
+  LEFT JOIN core_brokers.brokers AS cb_demand
+    ON cd.uuid_company = cb_demand.uuid_company
   WHERE
     NOT so.ts_sale_agreement_signed IS NULL
 )
@@ -262,6 +265,7 @@ SELECT
   id_company_supply,
   uuid_company_supply,
   id_company_demand,
+  sk_broker_demand,
   id_closing_specialist,
   id_legal_risk_analyst,
   id_pre_specialist,
