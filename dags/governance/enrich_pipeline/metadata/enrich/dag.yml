@@ -92,6 +92,14 @@ columns:
     lineage:
       - datalake_astro_clean.serialized_dag.json_data
     description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
+  freshness_max_staleness_minutes:
+    lineage:
+      - datalake_astro_clean.serialized_dag.json_data
+    description: Declared freshness SLA in minutes; NULL when the DAG is scored on a deadline.
+  freshness_active_window_localtime:
+    lineage:
+      - datalake_astro_clean.serialized_dag.json_data
+    description: São Paulo `HH:MM-HH:MM` window in which freshness is scored; NULL when the DAG declares no freshness SLA.
   has_special_scheduler:
     description: Boolean flag indicating if the DAG doesn't run everyday and has a special scheduler 
       (such as only runs on fridays, only runs on the first day of the month, etc.).

@@ -96,7 +96,9 @@ declared_tags AS (
     SELECT
         id_dag,
         NULLIF(REGEXP_EXTRACT(tags, 'criticality:(Critical|High|Medium|Low)', 1), '') AS criticality,
-        NULLIF(REGEXP_EXTRACT(tags, 'sla_deadline_localtime:([0-2][0-9]:[0-5][0-9])', 1), '') AS sla_deadline_localtime
+        NULLIF(REGEXP_EXTRACT(tags, 'sla_deadline_localtime:([0-2][0-9]:[0-5][0-9])', 1), '') AS sla_deadline_localtime,
+        CAST(NULLIF(REGEXP_EXTRACT(tags, 'freshness_max_staleness_minutes:([0-9]+)', 1), '') AS INT) AS freshness_max_staleness_minutes,
+        NULLIF(REGEXP_EXTRACT(tags, 'freshness_active_window_localtime:([0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9])', 1), '') AS freshness_active_window_localtime
     FROM
         declared_tags_ranked
     WHERE
@@ -224,6 +226,8 @@ base AS (
         d.is_datamart,
         COALESCE(dt.criticality, 'Medium') AS criticality,
         dt.sla_deadline_localtime,
+        dt.freshness_max_staleness_minutes,
+        dt.freshness_active_window_localtime,
         IF(DATE(s.ts_last_execution_started) = CURRENT_DATE, TRUE, FALSE) AS has_todays_run_happened,   -- Cases of D0 runs
         fe.ts_first_event,
         FROM_UTC_TIMESTAMP(fe.ts_first_event, 'America/Sao_Paulo') AS ts_first_event_brt,
@@ -289,6 +293,8 @@ SELECT
     is_datamart,
     criticality,
     sla_deadline_localtime,
+    freshness_max_staleness_minutes,
+    freshness_active_window_localtime,
     has_todays_run_happened,
     CASE
         WHEN has_todays_run_happened = TRUE AND is_inside_sla = TRUE AND is_in_sla_ignoring_list = FALSE THEN TRUE

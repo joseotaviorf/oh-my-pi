@@ -3,10 +3,10 @@ table_name: table_sla_information
 owner: jose.rferreira@quintoandar.com
 domain: Data Ops & Governance
 description: >
-  Daily delivery status for every active table of every active, unpaused DAG. Each row is
-  judged against a resolved São Paulo deadline: the DAG's declared deadline when the table
-  inherits that DAG's tier, 08:00 for Critical and High, and 11:00 for Medium and Low. Grain
-  is one row per table, producing DAG, and snapshot date.
+  Daily delivery status for every active table of every active, unpaused DAG. Rows are judged
+  on a deadline, or on freshness when the producing DAG declares freshness_max_staleness_minutes;
+  deliveries are successful load task instances plus log success events. Grain is one row per table,
+  producing DAG, and snapshot date.
 columns:
   id_table:
     lineage:
@@ -19,7 +19,7 @@ columns:
   id_task:
     lineage:
       - datalake_pipeline.table.id_task
-    description: Airflow load task that produces the table and emits its Dataset event.
+    description: Airflow load task that produces the table.
   id_line:
     lineage:
       - datalake_pipeline.dag_sla_information.id_line
@@ -66,31 +66,42 @@ columns:
       - datalake_pipeline.dag_sla_information.criticality
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
     description: >
-      Resolved table delivery deadline as São Paulo wall-clock HH:MM, never NULL. A declared
-      table deadline wins; otherwise use the DAG deadline when the table tier matches the DAG
-      tier, 08:00 for Critical and High, and 11:00 for Medium and Low.
+      Resolved table delivery deadline as São Paulo wall-clock HH:MM; never NULL for deadline
+      tables; NULL for freshness tables. A declared table deadline wins; otherwise use the DAG
+      deadline when the table tier matches the DAG tier, 08:00 for Critical and High, and 11:00
+      for Medium and Low.
   is_intraday_dag:
     lineage:
       - datalake_pipeline.dag_sla_information.is_intraday_dag
     description: Whether the producing DAG runs hourly or more frequently.
   is_delivered:
     lineage:
+      - datalake_airflow.task_instance.ts_ended
       - datalake_airflow.log.ts_event
-    description: Whether the producing load task logged a success during the snapshot delivery cycle.
+    description: Whether there was a delivery (successful load task instance or log success event) during the snapshot delivery cycle.
   is_inside_declared_sla:
     lineage:
+      - datalake_airflow.task_instance.ts_ended
       - datalake_airflow.log.ts_event
       - datalake_pipeline.table.sla_deadline_localtime
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
     description: >
-      Whether the first delivery met the resolved deadline. NULL only when that deadline has
-      not yet passed and no delivery exists; FALSE after the deadline or for a late delivery.
+      Whether deliveries met the declared SLA. For deadline tables, whether the first delivery
+      (successful load task instance or log success event) met the resolved deadline: NULL only
+      when that deadline has not yet passed and no delivery exists; FALSE after the deadline or
+      for a late delivery. For freshness tables, FALSE once observed staleness exceeds the declared
+      maximum; NULL while the window is still open without a breach; TRUE after the window closes
+      within the limit.
   minutes_after_deadline:
     lineage:
+      - datalake_airflow.task_instance.ts_ended
       - datalake_airflow.log.ts_event
       - datalake_pipeline.table.sla_deadline_localtime
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
-    description: Signed minutes from the resolved deadline to first delivery; negative means early.
+    description: >
+      Signed minutes from the resolved deadline to first delivery (successful load task instance
+      or log success event); negative means early; never NULL for deadline tables; NULL for
+      freshness tables.
   ts_deadline_brt:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot
@@ -98,11 +109,39 @@ columns:
       - datalake_pipeline.table.criticality
       - datalake_pipeline.dag_sla_information.criticality
       - datalake_pipeline.dag_sla_information.sla_deadline_localtime
-    description: Resolved snapshot deadline represented as a São Paulo wall-clock timestamp.
+    description: >
+      Resolved snapshot deadline represented as a São Paulo wall-clock timestamp; never NULL
+      for deadline tables; NULL for freshness tables.
   ts_first_delivery_brt:
     lineage:
+      - datalake_airflow.task_instance.ts_ended
       - datalake_airflow.log.ts_event
-    description: First successful load-task completion timestamp in São Paulo time during the delivery cycle.
+    description: First delivery (successful load task instance or log success event) timestamp in São Paulo time during the delivery cycle.
+  sla_type:
+    lineage:
+      - datalake_pipeline.dag.freshness_max_staleness_minutes
+    description: Type of SLA scoring applied to the table.
+    categories:
+      deadline: 'Scored against a daily deadline'
+      freshness: 'Scored on maximum staleness across an active window'
+  freshness_max_staleness_minutes:
+    lineage:
+      - datalake_pipeline.dag.freshness_max_staleness_minutes
+    description: Declared freshness SLA in minutes; NULL for deadline tables.
+  freshness_active_window_localtime:
+    lineage:
+      - datalake_pipeline.dag.freshness_active_window_localtime
+    description: São Paulo window in which freshness is scored; NULL for deadline tables.
+  deliveries_count:
+    lineage:
+      - datalake_airflow.task_instance.ts_ended
+      - datalake_airflow.log.ts_event
+    description: Distinct delivery minutes inside the attribution window.
+  freshness_observed_max_staleness_minutes:
+    lineage:
+      - datalake_airflow.task_instance.ts_ended
+      - datalake_airflow.log.ts_event
+    description: Longest minutes without a delivery in the elapsed active window; NULL for deadline tables and before the window opens.
   dt_snapshot:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot

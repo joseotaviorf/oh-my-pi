@@ -3514,6 +3514,7 @@ bietlejuice.enrich_pin:
 bietlejuice.enrich_pipeline:
   - bietlejuice.astro:load-clean-dag:first-run-of-day
   - bietlejuice.astro:load-clean-serialized-dag:first-run-of-day
+  - bietlejuice.enrich_airflow:load-enrich-task-instance:first-run-of-day
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account:first-run-of-day
   - bietlejuice.pixar:load-clean-charge:first-run-of-day

@@ -62,7 +62,7 @@ columns:
   is_delivered:
     lineage:
       - datalake_pipeline.table_sla_information.is_delivered
-    description: Whether the table emitted a Dataset event during the snapshot delivery cycle.
+    description: Whether the table had a delivery during the snapshot delivery cycle.
   is_inside_declared_sla:
     lineage:
       - datalake_pipeline.table_sla_information.is_inside_declared_sla
@@ -72,11 +72,35 @@ columns:
   ts_first_delivery_brt:
     lineage:
       - datalake_pipeline.table_sla_information.ts_first_delivery_brt
-    description: First Dataset delivery timestamp in São Paulo time during the delivery cycle.
+    description: First delivery timestamp in São Paulo time during the delivery cycle.
   minutes_after_deadline:
     lineage:
       - datalake_pipeline.table_sla_information.minutes_after_deadline
     description: Signed minutes from the resolved deadline to first delivery; negative means early.
+  sla_type:
+    lineage:
+      - datalake_pipeline.table_sla_information.sla_type
+    description: >
+      `deadline` or `freshness`: whether the table is judged on a delivery deadline or on freshness
+    categories:
+      deadline: 'Delivery deadline'
+      freshness: 'Freshness SLA'
+  freshness_max_staleness_minutes:
+    lineage:
+      - datalake_pipeline.table_sla_information.freshness_max_staleness_minutes
+    description: Declared freshness SLA in minutes; NULL for deadline tables
+  freshness_active_window_localtime:
+    lineage:
+      - datalake_pipeline.table_sla_information.freshness_active_window_localtime
+    description: São Paulo window in which freshness is scored; NULL for deadline tables
+  deliveries_count:
+    lineage:
+      - datalake_pipeline.table_sla_information.deliveries_count
+    description: Distinct delivery minutes inside the attribution window
+  freshness_observed_max_staleness_minutes:
+    lineage:
+      - datalake_pipeline.table_sla_information.freshness_observed_max_staleness_minutes
+    description: Longest minutes without a delivery in the elapsed active window; NULL for deadline tables and before the window opens
   dt_snapshot:
     lineage:
       - datalake_pipeline.table_sla_information.dt_snapshot
