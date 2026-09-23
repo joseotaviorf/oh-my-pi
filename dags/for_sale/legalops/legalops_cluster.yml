@@ -2,4 +2,13 @@ cluster:
   type: emr_7_12_consolidation_m_memory_single_node_fleet_cluster
   custom_configurations:
     aws_attributes:
-      ebs_volume_size: 32
+      ebs_volume_size: 32  
+    spark_conf:
+      spark.driver.memory: 2g
+      spark.driver.memoryOverhead: 512m
+      spark.executor.memory: 14g
+      spark.executor.memoryOverhead: 2g
+      spark.executor.cores: "2"
+      spark.yarn.am.memory: 1g
+      spark.dynamicAllocation.maxExecutors: "4"
+      spark.sql.parquet.columnarReaderBatchSize: 1024
