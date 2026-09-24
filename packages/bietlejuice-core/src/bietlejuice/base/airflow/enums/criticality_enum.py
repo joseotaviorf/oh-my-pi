@@ -53,6 +53,31 @@ class CriticalityEnum:
             )
         return value
 
+    _PRIORITY_WEIGHT: ClassVar[dict[str, int]] = {
+        CRITICAL: 100,
+        HIGH: 50,
+        MEDIUM: 1,
+        LOW: 1,
+    }
+
+    @classmethod
+    def effective_tier(cls, dag_args: dict, workflow_args: dict) -> str:
+        """Highest of the DAG's declared criticality and its tables' criticalities."""
+        return cls.highest(
+            [dag_args.get("criticality")]
+            + [
+                customization.get("criticality")
+                for customization in (
+                    workflow_args.get("tables_customization") or {}
+                ).values()
+                if isinstance(customization, dict)
+            ]
+        )
+
+    @classmethod
+    def priority_weight(cls, tier: str) -> int:
+        return cls._PRIORITY_WEIGHT[tier]
+
     @classmethod
     def to_opsgenie_priority(cls, value: str) -> str:
         return cls._OPSGENIE_PRIORITY[value]

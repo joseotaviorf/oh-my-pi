@@ -8,6 +8,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml
     resolve_validation_block,
 )
 from bietlejuice.base.airflow.datasets.dataset_encoder import DatasetEncoder
+from bietlejuice.base.airflow.enums.criticality_enum import CriticalityEnum
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -107,6 +108,31 @@ def _datasets_code(
     return DatasetEncoder.encode_dataset_as_python_code(None)
 
 
+def _priority_tiers(dependencies: dict) -> dict[str, str]:
+    """Each DAG's scheduling tier: the highest effective tier of itself and every DAG downstream of it."""
+    own_tiers = {}
+    for declaration_file in glob(
+        f"{DAG_PACKAGES_ROOT}/**/*_declaration.yml", recursive=True
+    ):
+        declaration = FileService.get_dict_from_yaml_file(declaration_file) or {}
+        own_tiers[basename(dirname(declaration_file))] = CriticalityEnum.effective_tier(
+            declaration.get("dag") or {}, declaration.get("workflow") or {}
+        )
+    downstream_index = BietlejuiceDependencyHelper.build_downstream_index(dependencies)
+    return {
+        dag_name: CriticalityEnum.highest(
+            [tier]
+            + [
+                own_tiers.get(downstream.removeprefix("bietlejuice."))
+                for downstream in BietlejuiceDependencyHelper.find_downstream_dags(
+                    f"bietlejuice.{dag_name}", downstream_index=downstream_index
+                )
+            ]
+        )
+        for dag_name, tier in own_tiers.items()
+    }
+
+
 def create_dag_files(
     dag_name_glob: str = "*",
     include_dir: str | None = None,
@@ -115,6 +141,7 @@ def create_dag_files(
     print("msg=Reading dependencies\n")
     dependencies = BietlejuiceDependencyHelper.read_dependencies()
     redundant_dependency_finder = BietlejuiceRedundantDependencyFinder(dependencies)
+    priority_tiers = _priority_tiers(dependencies)
 
     print(f"template={DAGS_TEMPLATE_FILE_PATH}, msg=Creating DAG files from template\n")
     with open(DAGS_TEMPLATE_FILE_PATH) as f:
@@ -147,7 +174,11 @@ def create_dag_files(
         )
 
         with open(dag_python_file, "w") as f:
-            f.write(template.format(datasets=datasets_code))
+            f.write(
+                template.format(
+                    datasets=datasets_code, priority_tier=repr(priority_tiers[dag_name])
+                )
+            )
         print(
             f"dag_name={dag_name}, dag_python_file={dag_python_file}, msg=Created DAG python file\n"
         )
@@ -170,7 +201,7 @@ def create_dag_files(
 def _write_bundles(
     *,
     template: str,
-    by_domain: dict[str, list[tuple[str, str]]],
+    by_domain: dict[str, list[tuple[str, str, str]]],
     output_dir: str,
     file_prefix: str,
     max_dags_per_bundle: int,
@@ -190,8 +221,8 @@ def _write_bundles(
             dag_specs = (
                 "[\n"
                 + "".join(
-                    f"    ({dag_name!r}, {datasets_code}),\n"
-                    for dag_name, datasets_code in chunk
+                    f"    ({dag_name!r}, {datasets_code}, {priority_tier_code}),\n"
+                    for dag_name, datasets_code, priority_tier_code in chunk
                 )
                 + "]"
             )
@@ -226,6 +257,7 @@ def create_domain_bundles(
 
     dependencies = BietlejuiceDependencyHelper.read_dependencies()
     redundant_dependency_finder = BietlejuiceRedundantDependencyFinder(dependencies)
+    priority_tiers = _priority_tiers(dependencies)
     with open(DOMAIN_BUNDLE_TEMPLATE_FILE_PATH) as f:
         template = f.read()
 
@@ -239,8 +271,8 @@ def create_domain_bundles(
             if f"/{exclude_dir}/" not in file_path
         ]
 
-    by_domain: dict[str, list[tuple[str, str]]] = {}
-    validation_by_domain: dict[str, list[tuple[str, str]]] = {}
+    by_domain: dict[str, list[tuple[str, str, str]]] = {}
+    validation_by_domain: dict[str, list[tuple[str, str, str]]] = {}
     excluded_stubs = []
     for declaration_file in declaration_files:
         dag_package_path = dirname(declaration_file)
@@ -251,10 +283,14 @@ def create_domain_bundles(
         )
         stub_path = join(dag_package_path, f"{dag_name}{DAG_PYTHON_FILE_SUFFIX}.py")
         excluded_stubs.append(relpath(stub_path, DAG_PACKAGES_ROOT))
-        by_domain.setdefault(domain, []).append((dag_name, datasets_code))
+        by_domain.setdefault(domain, []).append(
+            (dag_name, datasets_code, repr(priority_tiers[dag_name]))
+        )
         if include_validation and has_validation_cluster(dag_package_path, dag_name):
             # Validation DAGs never take dataset dependencies.
-            validation_by_domain.setdefault(domain, []).append((dag_name, "None"))
+            validation_by_domain.setdefault(domain, []).append(
+                (dag_name, "None", "None")
+            )
 
     makedirs(output_dir, exist_ok=True)
     # Validation bundles are always cleaned, including when the flag is off, so a

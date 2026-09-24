@@ -6,6 +6,7 @@ from typing import Set, Tuple
 
 from airflow import DAG
 from airflow.datasets import BaseDataset
+from airflow.utils.weight_rule import WeightRule
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
@@ -147,15 +148,8 @@ class BaseWorkflow(BuilderInterface):
                     dag_tags.append(
                         f"{SLA_DEADLINE_TAG_PREFIX}{sla_deadline_localtime}"
                     )
-            effective_tier = CriticalityEnum.highest(
-                [self.dag_args.get("criticality")]
-                + [
-                    customization.get("criticality")
-                    for customization in (
-                        self.workflow_args.get("tables_customization") or {}
-                    ).values()
-                    if isinstance(customization, dict)
-                ]
+            effective_tier = CriticalityEnum.effective_tier(
+                self.dag_args, self.workflow_args
             )
             if effective_tier != CriticalityEnum.DEFAULT:
                 dag_tags.append(f"{EFFECTIVE_TIER_TAG_PREFIX}{effective_tier}")
@@ -170,6 +164,13 @@ class BaseWorkflow(BuilderInterface):
         }
         if self.is_validation:
             default_args["retries"] = 0
+        else:
+            default_args["priority_weight"] = CriticalityEnum.priority_weight(
+                CriticalityEnum.highest(
+                    [self.dag_args.get("priority_tier"), effective_tier]
+                )
+            )
+            default_args["weight_rule"] = WeightRule.ABSOLUTE
 
         optional_dag_kwargs = {}
         max_active_tasks = self.dag_args.get("max_active_tasks")

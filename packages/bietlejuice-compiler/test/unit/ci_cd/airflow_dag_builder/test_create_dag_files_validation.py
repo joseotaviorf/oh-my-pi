@@ -158,8 +158,8 @@ def test_create_domain_bundles_chunks_and_writes_exact_excludes(
         "growth/dag_a/dag_a_dag.py",
         "growth/dag_b/dag_b_dag.py",
     ]
-    assert "('dag_a', None)" in Path(bundles[0]).read_text()
-    assert "('dag_b', None)" in Path(bundles[1]).read_text()
+    assert "('dag_a', None, 'Medium')" in Path(bundles[0]).read_text()
+    assert "('dag_b', None, 'Medium')" in Path(bundles[1]).read_text()
 
 
 def test_generated_bundle_loads_all_dags_with_stable_ids(
@@ -395,11 +395,11 @@ def test_include_validation_emits_separate_bundles(
     production = Path(bundles[0]).read_text()
     validation = Path(bundles[1]).read_text()
     assert "_IS_VALIDATION = False" in production
-    assert "('dw_employee', None)" in production
-    assert "('dw_people', None)" in production
+    assert "('dw_employee', None, 'Medium')" in production
+    assert "('dw_people', None, 'Medium')" in production
     # Only the DAG with a validation.cluster reaches the validation bundle.
     assert "_IS_VALIDATION = True" in validation
-    assert "('dw_employee', None)" in validation
+    assert "('dw_employee', None, None)" in validation
     assert "dw_people" not in validation
 
 

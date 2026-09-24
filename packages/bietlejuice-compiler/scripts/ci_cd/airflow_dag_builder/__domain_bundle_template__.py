@@ -56,10 +56,10 @@ def _quarantine_dag(dag_id, error_text):
     return dag
 
 
-def _build_dag(dag_name, datasets):
+def _build_dag(dag_name, datasets, priority_tier):
     dag_declaration = DAGYamlParser(dag_name=dag_name).dag_declaration()
     factory_args = {
-        "dag_args": dag_declaration["dag"],
+        "dag_args": dict(dag_declaration["dag"], priority_tier=priority_tier),
         "workflow_args": dag_declaration["workflow"],
         "cluster_args": dag_declaration["cluster"],
         "dataset_dependencies": datasets,
@@ -87,9 +87,11 @@ def _build_dag(dag_name, datasets):
 
 _suffix = BaseWorkflow.VALIDATION_DAG_SUFFIX if _IS_VALIDATION else ""
 _prefix = "validation_dag" if _IS_VALIDATION else "dag"
-for _index, (_dag_name, _datasets) in enumerate(_DAG_SPECS):
+for _index, (_dag_name, _datasets, _priority_tier) in enumerate(_DAG_SPECS):
     try:
-        globals()[f"{_prefix}_{_index:03d}"] = _build_dag(_dag_name, _datasets)
+        globals()[f"{_prefix}_{_index:03d}"] = _build_dag(
+            _dag_name, _datasets, _priority_tier
+        )
     except Exception as _exc:  # noqa: BLE001 — quarantine, never fail the batch
         _LOG.exception("Bundled DAG build failed: %s", _dag_name)
         globals()[f"{_prefix}_{_index:03d}"] = _quarantine_dag(
