@@ -552,6 +552,6 @@ def test_notify_hub_posts_dm_only_without_space(monkeypatch):
 
     assert captured["payload"] == {
         "cardsV2": [card],
-        "info": {"email": ["ic@q.com"]},
+        "info": {"email": ["ic@q.com"], "mention": True},
     }
     assert "space" not in captured["payload"]

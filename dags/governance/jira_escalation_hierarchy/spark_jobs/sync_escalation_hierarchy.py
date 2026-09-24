@@ -488,7 +488,10 @@ def _notify_hub(webhook_base: str, email: str, card: dict) -> bool:
     # status on the webhook response (async SQS), and setting ``space`` today
     # always posts to the channel even when DM succeeds — so we send DM-only
     # until NHI implements conditional fallback (+ plain-text @mention in DM).
-    payload = {"cardsV2": [card], "info": {"email": [email]}}
+    payload = {
+        "cardsV2": [card],
+        "info": {"email": [email], "mention": True},
+    }
     try:
         response = requests.post(
             webhook_base, json=payload, timeout=REQUEST_TIMEOUT_SECONDS
