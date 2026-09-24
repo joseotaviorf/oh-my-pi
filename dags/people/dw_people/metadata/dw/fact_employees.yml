@@ -28,9 +28,9 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.id_business_unit
   sk_job:
-    description: Surrogate key for the job version that applies on this reference date.
+    description: Key of the employee's current job (e.g. '123456'). References dw_organization.dim_job.sk_job.
     lineage:
-      - datalake_people.assignment_snapshots.sk_job_version
+      - datalake_people.assignment_snapshots.id_job
   sk_cost_center_version:
     description: Surrogate key for the cost center organizational version effective on this reference date.
     lineage:
