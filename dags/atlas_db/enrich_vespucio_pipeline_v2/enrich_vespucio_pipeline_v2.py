@@ -48,9 +48,6 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 output_location = config_service.get_config("vespucio_output_path")
 kafka_bootstrap_servers = config_service.get_config("kafka_bootstrap_servers")
-kodak_photo_duplication_sqs_queue_url = config_service.get_config(
-    "kodak_photo_duplication_sqs_queue_url"
-)
 kodak_photo_sns_arn = config_service.get_config("kodak_photo_sns_arn")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
@@ -418,31 +415,6 @@ image_enrich_step_task = create_task(
     ],
 )
 
-# Publishes Kodak photo duplication requests (dejavuid -> new external_id) to
-# ProdKodakPhotoDuplicationQueue so PhotoDuplicationConsumer can duplicate the photo without
-# re-downloading/re-uploading it. Volume per run is capped by the
-# photo_duplication_step_max_images_per_run ConfigCat flag, which fails closed (defaults to 0,
-# i.e. disabled) if --configcat_sdk_key_path is omitted or ConfigCat is unreachable. Omitting
-# --sqs_queue_url additionally runs the step in dry-run mode (Forno has no equivalent queue yet).
-photo_duplication_step_task = create_task(
-    entry_point="core_v2_photo_duplication_step",
-    parameters=[
-        f"--input_source_kodak_atlas_images={Tables.source_kodak_atlas_images_v2}",
-        f"--input_kodak_photo={Tables.kodak_photo}",
-        f"--input_photo_duplication_sent={Tables.kodak_photo_duplication_sent}",
-        f"--output_photo_duplication_sent={Tables.kodak_photo_duplication_sent}",
-        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
-        *(
-            [f"--sqs_queue_url={kodak_photo_duplication_sqs_queue_url}"]
-            if kodak_photo_duplication_sqs_queue_url
-            else []
-        ),
-        "--sqs_region=us-east-1",
-        "--sqs_batch_size=10",
-    ],
-    task_id="photo_duplication",
-)
-
 artifacts_step_task = create_task(
     entry_point="core_v2_artifacts_step",
     parameters=[
@@ -594,7 +566,6 @@ DatasetAdder.attach_dataset_to_task(vespucio_v2_pipeline_complete_task)
 
 execute_job_cluster_task >> source_tasks
 execute_job_cluster_task >> kodak_atlas_images_task
-kodak_atlas_images_task >> photo_duplication_step_task
 execute_job_cluster_task >> image_grouping_step_task
 execute_job_cluster_task >> claims_source_tasks
 claims_source_tasks >> claims_step_task
