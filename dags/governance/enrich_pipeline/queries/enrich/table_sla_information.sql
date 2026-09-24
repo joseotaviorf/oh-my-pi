@@ -1,4 +1,17 @@
-WITH scoped AS (
+WITH first_declared AS (
+    SELECT
+        t.id_table,
+        t.id_dag,
+        t.id_task,
+        MIN(t.dt_last_updated) AS dt_first_declared
+    FROM
+        datalake_pipeline.table AS t
+    GROUP BY
+        t.id_table,
+        t.id_dag,
+        t.id_task
+),
+scoped AS (
     SELECT DISTINCT
         t.id_table,
         t.id_dag,
@@ -25,6 +38,14 @@ WITH scoped AS (
     LEFT JOIN
         datalake_pipeline.dag AS pd
             ON pd.id_dag = t.id_dag
+    -- A table counts from the day after it first appears in the DAG inventory, so a
+    -- backfill never scores today's tables on days before they existed.
+    JOIN
+        first_declared AS fd
+            ON fd.id_table = t.id_table
+            AND fd.id_dag = t.id_dag
+            AND fd.id_task = t.id_task
+            AND ds.dt_snapshot > fd.dt_first_declared
     WHERE
         t.is_active = TRUE
         AND MAKE_DATE(ds.year, ds.month, ds.day)

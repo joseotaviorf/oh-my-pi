@@ -5,8 +5,9 @@ domain: Data Ops & Governance
 description: >
   Daily delivery status for every active table of every active, unpaused DAG. Rows are judged
   on a deadline, or on freshness when the producing DAG declares freshness_max_staleness_minutes;
-  deliveries are successful load task instances plus log success events. Grain is one row per table,
-  producing DAG, and snapshot date.
+  deliveries are successful load task instances plus log success events. A table is scored from the
+  day after it first appears in the DAG inventory. Grain is one row per table, producing DAG, and
+  snapshot date.
 columns:
   id_table:
     lineage:
@@ -145,7 +146,8 @@ columns:
   dt_snapshot:
     lineage:
       - datalake_pipeline.dag_sla_information.dt_snapshot
-    description: Date whose resolved delivery deadline is being evaluated.
+      - datalake_pipeline.table.dt_last_updated
+    description: Date whose resolved delivery deadline is being evaluated; always after the table first appears in the DAG inventory.
   ts_load:
     description: Timestamp when enrich_pipeline wrote this SLA snapshot.
   year:
