@@ -821,7 +821,10 @@ class DAGDeclarationValidator(Validator):
             if isinstance(customization, dict)
         }
 
-        if "fast_lane" in dag_name or dag.get("freshness_max_staleness_minutes") is not None:
+        if (
+            "fast_lane" in dag_name
+            or dag.get("freshness_max_staleness_minutes") is not None
+        ):
             offenders = [
                 table_name
                 for table_name, customization in tables_customization.items()
@@ -836,17 +839,22 @@ class DAGDeclarationValidator(Validator):
                     f"criticality: Critical (found on {offenders}); use at most 'High'"
                 )
 
-        latest_critical_deadline = CriticalityEnum.default_deadline(CriticalityEnum.CRITICAL)
+        latest_critical_deadline = CriticalityEnum.default_deadline(
+            CriticalityEnum.CRITICAL
+        )
         exempt_from_late_deadline = dag_name in self._LATE_CRITICAL_DEADLINE_DAGS
         late_offenders = [
             table_name
             for table_name, customization in tables_customization.items()
-            if (customization.get("criticality") or dag_criticality) == CriticalityEnum.CRITICAL
-            and (customization.get("sla_deadline_localtime") or "00:00") > latest_critical_deadline
+            if (customization.get("criticality") or dag_criticality)
+            == CriticalityEnum.CRITICAL
+            and (customization.get("sla_deadline_localtime") or "00:00")
+            > latest_critical_deadline
         ]
         if (
             dag_criticality == CriticalityEnum.CRITICAL
-            and (dag.get("sla_deadline_localtime") or "00:00") > latest_critical_deadline
+            and (dag.get("sla_deadline_localtime") or "00:00")
+            > latest_critical_deadline
         ):
             late_offenders.insert(0, "dag")
         if late_offenders and not exempt_from_late_deadline:
