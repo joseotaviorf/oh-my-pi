@@ -1,0 +1,154 @@
+database_name: ops_fintech
+table_name: recon_for_sale_input_layer
+owner: lucas.prado@quintoandar.com
+domain: Fintech
+description: Table `recon_for_sale_input_layer` materialized on a schedule by Luigi from a user-provided SQL query (Ops Fintech domain).
+columns:
+  id_offer:
+    description: Column `id_offer` produced by the scheduled materialization query.
+  id_house:
+    description: Column `id_house` produced by the scheduled materialization query.
+  dt_recon_platform:
+    description: Column `dt_recon_platform` produced by the scheduled materialization query.
+  dt_legal_analysis_platform:
+    description: Column `dt_legal_analysis_platform` produced by the scheduled materialization query.
+  dt_cancelled:
+    description: Column `dt_cancelled` produced by the scheduled materialization query.
+  dt_rescued:
+    description: Column `dt_rescued` produced by the scheduled materialization query.
+  dt_accounting_entry:
+    description: Column `dt_accounting_entry` produced by the scheduled materialization query.
+  dt_sale_agreement_signed:
+    description: Column `dt_sale_agreement_signed` produced by the scheduled materialization query.
+  dt_payment_allowed:
+    description: Column `dt_payment_allowed` produced by the scheduled materialization query.
+  business_unit_description:
+    description: Column `business_unit_description` produced by the scheduled materialization query.
+  payment_model:
+    description: Column `payment_model` produced by the scheduled materialization query.
+  is_contract_amendment:
+    description: Column `is_contract_amendment` produced by the scheduled materialization query.
+  is_legal_entity:
+    description: Column `is_legal_entity` produced by the scheduled materialization query.
+  cost_center_platform:
+    description: Column `cost_center_platform` produced by the scheduled materialization query.
+  location:
+    description: Column `location` produced by the scheduled materialization query.
+  supply_x_demand_platform:
+    description: Column `supply_x_demand_platform` produced by the scheduled materialization query.
+  cancellation_brokerage:
+    description: Column `cancellation_brokerage` produced by the scheduled materialization query.
+  offer_cancelled:
+    description: Column `offer_cancelled` produced by the scheduled materialization query.
+  sale_price_agreed_sales:
+    description: Column `sale_price_agreed_sales` produced by the scheduled materialization query.
+  brokerage_fee_sales:
+    description: Column `brokerage_fee_sales` produced by the scheduled materialization query.
+  sale_price_agreed_monopoly:
+    description: Column `sale_price_agreed_monopoly` produced by the scheduled materialization query.
+  brokerage_fee_monopoly:
+    description: Column `brokerage_fee_monopoly` produced by the scheduled materialization query.
+  sale_price_agreed_platform:
+    description: Column `sale_price_agreed_platform` produced by the scheduled materialization query.
+  brokerage_amount_platform:
+    description: Column `brokerage_amount_platform` produced by the scheduled materialization query.
+  brokerage_fee_platform:
+    description: Column `brokerage_fee_platform` produced by the scheduled materialization query.
+  brokerage_quinto_andar_amount_platform:
+    description: Column `brokerage_quinto_andar_amount_platform` produced by the scheduled materialization query.
+  brokerage_quinto_andar_fee:
+    description: Column `brokerage_quinto_andar_fee` produced by the scheduled materialization query.
+  partner_fee_value_demand_platform:
+    description: Column `partner_fee_value_demand_platform` produced by the scheduled materialization query.
+  brokerage_estate_agent_amount_platform:
+    description: Column `brokerage_estate_agent_amount_platform` produced by the scheduled materialization query.
+  brokerage_estate_agent_fee:
+    description: Column `brokerage_estate_agent_fee` produced by the scheduled materialization query.
+  total_received_platform:
+    description: Column `total_received_platform` produced by the scheduled materialization query.
+  broker_payment_robin_hood:
+    description: Column `broker_payment_robin_hood` produced by the scheduled materialization query.
+  broker_payment_accounting_entry:
+    description: Column `broker_payment_accounting_entry` produced by the scheduled materialization query.
+  broker_payment_platform:
+    description: Column `broker_payment_platform` produced by the scheduled materialization query.
+  broker_discount_platform:
+    description: Column `broker_discount_platform` produced by the scheduled materialization query.
+  band_aid_cost:
+    description: Column `band_aid_cost` produced by the scheduled materialization query.
+  dt_reference_ledger:
+    description: Column `dt_reference_ledger` produced by the scheduled materialization query.
+  rede_payment:
+    description: Column `rede_payment` produced by the scheduled materialization query.
+  amount_indemnity_payment:
+    description: Column `amount_indemnity_payment` produced by the scheduled materialization query.
+  dt_legal_analysis_demand:
+    description: Column `dt_legal_analysis_demand` produced by the scheduled materialization query.
+  sale_price_agreed_rede_demand:
+    description: Column `sale_price_agreed_rede_demand` produced by the scheduled materialization query.
+  brokerage_fee_rede_demand:
+    description: Column `brokerage_fee_rede_demand` produced by the scheduled materialization query.
+  brokerage_amount_rede_demand:
+    description: Column `brokerage_amount_rede_demand` produced by the scheduled materialization query.
+  partner_fee_value_demand_rede:
+    description: Column `partner_fee_value_demand_rede` produced by the scheduled materialization query.
+  brokerage_quinto_andar_amount_rede_demand:
+    description: Column `brokerage_quinto_andar_amount_rede_demand` produced by the scheduled materialization query.
+  brokerage_estate_agent_amount_rede_demand:
+    description: Column `brokerage_estate_agent_amount_rede_demand` produced by the scheduled materialization query.
+  dt_legal_analysis_supply:
+    description: Column `dt_legal_analysis_supply` produced by the scheduled materialization query.
+  sale_price_agreed_rede_supply:
+    description: Column `sale_price_agreed_rede_supply` produced by the scheduled materialization query.
+  brokerage_fee_rede_supply:
+    description: Column `brokerage_fee_rede_supply` produced by the scheduled materialization query.
+  brokerage_amount_rede_supply:
+    description: Column `brokerage_amount_rede_supply` produced by the scheduled materialization query.
+  brokerage_quinto_andar_amount_rede_supply:
+    description: Column `brokerage_quinto_andar_amount_rede_supply` produced by the scheduled materialization query.
+  brokerage_estate_agent_amount_rede_supply:
+    description: Column `brokerage_estate_agent_amount_rede_supply` produced by the scheduled materialization query.
+  dt_legal_analysis:
+    description: Column `dt_legal_analysis` produced by the scheduled materialization query.
+  supply_x_demand:
+    description: Column `supply_x_demand` produced by the scheduled materialization query.
+  cost_center:
+    description: Column `cost_center` produced by the scheduled materialization query.
+  invoice_amount_current_period:
+    description: Column `invoice_amount_current_period` produced by the scheduled materialization query.
+  invoice_amount:
+    description: Column `invoice_amount` produced by the scheduled materialization query.
+  dt_recon:
+    description: Column `dt_recon` produced by the scheduled materialization query.
+  broker_payment_rede_ti:
+    description: Column `broker_payment_rede_ti` produced by the scheduled materialization query.
+  broker_payment:
+    description: Column `broker_payment` produced by the scheduled materialization query.
+  classification_treatment_rede_recon:
+    description: Column `classification_treatment_rede_recon` produced by the scheduled materialization query.
+  brokerage_amount:
+    description: Column `brokerage_amount` produced by the scheduled materialization query.
+  brokerage_estate_agent_amount:
+    description: Column `brokerage_estate_agent_amount` produced by the scheduled materialization query.
+  brokerage_quinto_andar_amount:
+    description: Column `brokerage_quinto_andar_amount` produced by the scheduled materialization query.
+  sale_price_agreed:
+    description: Column `sale_price_agreed` produced by the scheduled materialization query.
+  brokerage_fee:
+    description: Column `brokerage_fee` produced by the scheduled materialization query.
+  partner_fee_value_demand:
+    description: Column `partner_fee_value_demand` produced by the scheduled materialization query.
+  classification_treatment_discount_recon:
+    description: Column `classification_treatment_discount_recon` produced by the scheduled materialization query.
+  classification_treatment_broker_payment_recon:
+    description: Column `classification_treatment_broker_payment_recon` produced by the scheduled materialization query.
+  broker_discount:
+    description: Column `broker_discount` produced by the scheduled materialization query.
+  classification_treatment_negative_received_recon:
+    description: Column `classification_treatment_negative_received_recon` produced by the scheduled materialization query.
+  total_received:
+    description: Column `total_received` produced by the scheduled materialization query.
+  classification_treatment_cash_flow_x_brokerage_recon:
+    description: Column `classification_treatment_cash_flow_x_brokerage_recon` produced by the scheduled materialization query.
+  gross_brokerage_amount:
+    description: Column `gross_brokerage_amount` produced by the scheduled materialization query.
