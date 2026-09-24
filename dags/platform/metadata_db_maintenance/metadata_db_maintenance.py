@@ -95,11 +95,14 @@ JOIN (
     GROUP BY dag_id
 ) latest ON latest.dag_id = dr.dag_id AND latest.max_start_date = dr.start_date
 """
+# dag_run.start_date has no index; walking the primary key from the last chunk avoids a full scan and sort per chunk.
 DAG_RUN_CHUNK_SQL = """
 SELECT id, dag_id, run_id
 FROM dag_run
-WHERE start_date < :cutoff AND id <> ALL(CAST(:keep_ids AS integer[]))
-ORDER BY start_date
+WHERE id > :after_id
+  AND start_date < :cutoff
+  AND id <> ALL(CAST(:keep_ids AS integer[]))
+ORDER BY id
 LIMIT :size
 """
 # Equality on both `ti_dag_run (dag_id, run_id)` columns keeps this an index
@@ -115,10 +118,12 @@ DELETE FROM log WHERE id = ANY(ARRAY(
     SELECT id FROM log WHERE dttm < :cutoff ORDER BY dttm LIMIT :size
 ))
 """
+# Equality on job_type plus ORDER BY latest_heartbeat walks job_type_heart; job_type = ANY(...) without ORDER BY planned a seq scan of job.
 DELETE_JOB_CHUNK_SQL = """
 DELETE FROM job WHERE id = ANY(ARRAY(
     SELECT id FROM job
-    WHERE job_type = ANY(CAST(:job_types AS text[])) AND latest_heartbeat < :cutoff
+    WHERE job_type = :job_type AND latest_heartbeat < :cutoff
+    ORDER BY latest_heartbeat
     LIMIT :size
 ))
 """
@@ -157,23 +162,35 @@ def _log_table_sizes(session: Session = NEW_SESSION):
         )
 
 
-def _delete_dag_run_chunk(session, size, *, cutoff, keep_ids):
-    runs = session.execute(
-        text(DAG_RUN_CHUNK_SQL),
-        {"cutoff": cutoff, "keep_ids": keep_ids, "size": size},
-    ).fetchall()
-    if not runs:
-        return {"dag_run": 0, "task_instance": 0}
-    n_task_instances = 0
-    for run in runs:
-        n_task_instances += session.execute(
-            text(DELETE_TASK_INSTANCES_SQL),
-            {"dag_id": run.dag_id, "run_id": run.run_id},
+class _DagRunChunks:
+    def __init__(self, cutoff, keep_ids):
+        self.cutoff = cutoff
+        self.keep_ids = keep_ids
+        self.after_id = 0
+
+    def __call__(self, session, size):
+        runs = session.execute(
+            text(DAG_RUN_CHUNK_SQL),
+            {
+                "cutoff": self.cutoff,
+                "keep_ids": self.keep_ids,
+                "size": size,
+                "after_id": self.after_id,
+            },
+        ).fetchall()
+        if not runs:
+            return {"dag_run": 0, "task_instance": 0}
+        n_task_instances = 0
+        for run in runs:
+            n_task_instances += session.execute(
+                text(DELETE_TASK_INSTANCES_SQL),
+                {"dag_id": run.dag_id, "run_id": run.run_id},
+            ).rowcount
+        n_dag_runs = session.execute(
+            text(DELETE_DAG_RUNS_SQL), {"ids": [run.id for run in runs]}
         ).rowcount
-    n_dag_runs = session.execute(
-        text(DELETE_DAG_RUNS_SQL), {"ids": [run.id for run in runs]}
-    ).rowcount
-    return {"dag_run": n_dag_runs, "task_instance": n_task_instances}
+        self.after_id = runs[-1].id
+        return {"dag_run": n_dag_runs, "task_instance": n_task_instances}
 
 
 def _delete_log_chunk(session, size, *, cutoff):
@@ -184,11 +201,15 @@ def _delete_log_chunk(session, size, *, cutoff):
 
 
 def _delete_job_chunk(session, size, *, cutoff):
-    result = session.execute(
-        text(DELETE_JOB_CHUNK_SQL),
-        {"cutoff": cutoff, "size": size, "job_types": JOB_TYPES},
-    )
-    return {"job": result.rowcount}
+    remaining = size
+    for job_type in JOB_TYPES:
+        if remaining == 0:
+            break
+        remaining -= session.execute(
+            text(DELETE_JOB_CHUNK_SQL),
+            {"cutoff": cutoff, "size": remaining, "job_type": job_type},
+        ).rowcount
+    return {"job": size - remaining}
 
 
 class _ChunkPurger:
@@ -275,7 +296,7 @@ def _purge_large_tables(params, cutoff, deadline, failures):
 
         dag_run_purger = _ChunkPurger(
             "dag_run",
-            partial(_delete_dag_run_chunk, cutoff=cutoff, keep_ids=keep_ids),
+            _DagRunChunks(cutoff, keep_ids),
             params["dag_runs_per_chunk"],
             MAX_DAG_RUNS_PER_CHUNK,
         )
@@ -295,7 +316,8 @@ def _purge_large_tables(params, cutoff, deadline, failures):
         purgers = list(all_purgers)
 
         candidate = session.execute(
-            text(DAG_RUN_CHUNK_SQL), {"cutoff": cutoff, "keep_ids": keep_ids, "size": 1}
+            text(DAG_RUN_CHUNK_SQL),
+            {"cutoff": cutoff, "keep_ids": keep_ids, "size": 1, "after_id": 0},
         ).first()
         if candidate is None:
             purgers.remove(dag_run_purger)
@@ -319,16 +341,19 @@ def _purge_large_tables(params, cutoff, deadline, failures):
         if "Seq Scan on log" in plan:
             purgers.remove(log_purger)
             failures.append("log delete plan uses a sequential scan")
-        _explain(
+        plan = _explain(
             session,
             DELETE_JOB_CHUNK_SQL,
             {
                 "cutoff": cutoff,
                 "size": params["rows_per_chunk"],
-                "job_types": JOB_TYPES,
+                "job_type": JOB_TYPES[0],
             },
             "job delete",
         )
+        if "Seq Scan on job" in plan:
+            purgers.remove(job_purger)
+            failures.append("job delete plan uses a sequential scan")
         _explain(
             session,
             DAG_RUN_CHUNK_SQL,
@@ -336,6 +361,7 @@ def _purge_large_tables(params, cutoff, deadline, failures):
                 "cutoff": cutoff,
                 "keep_ids": keep_ids,
                 "size": params["dag_runs_per_chunk"],
+                "after_id": 0,
             },
             "dag_run chunk select",
         )
@@ -375,8 +401,8 @@ with DAG(
     dag_id=DAG_ID,
     default_args=default_args,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
-    schedule_interval="0 13 * * *",
-    start_date=pendulum.datetime(2026, 9, 1, tz="UTC"),
+    schedule_interval="0 12 * * *",
+    start_date=pendulum.datetime(2026, 9, 1, tz="America/Sao_Paulo"),
     catchup=False,
     max_active_runs=1,
     params={
@@ -397,13 +423,13 @@ with DAG(
             description="Log what would be deleted without deleting.",
         ),
         "max_runtime_minutes": Param(
-            45,
+            110,
             type="integer",
             minimum=1,
-            maximum=170,
+            maximum=110,
             description=(
-                "Stop starting new delete chunks after this many minutes; "
-                "the next run continues."
+                "Stop starting new delete chunks after this many minutes (at most 110, "
+                "inside the task's 2-hour timeout); the next run continues."
             ),
         ),
         "dag_runs_per_chunk": Param(
@@ -437,7 +463,7 @@ with DAG(
     def report_table_sizes():
         _log_table_sizes()
 
-    @task(execution_timeout=timedelta(hours=3))
+    @task(execution_timeout=timedelta(hours=2))
     def clean_metadata_db(**context):
         params = context["params"]
         raw_cutoff = params["clean_before_timestamp"]
