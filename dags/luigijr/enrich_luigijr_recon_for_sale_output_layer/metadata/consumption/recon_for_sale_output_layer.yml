@@ -1,0 +1,104 @@
+database_name: ops_fintech
+table_name: recon_for_sale_output_layer
+owner: lucas.prado@quintoandar.com
+domain: Fintech
+description: Table `recon_for_sale_output_layer` materialized on a schedule by Luigi from a user-provided SQL query (Ops Fintech domain).
+columns:
+  id_offer:
+    description: Column `id_offer` produced by the scheduled materialization query.
+  id_house:
+    description: Column `id_house` produced by the scheduled materialization query.
+  business_unit_description:
+    description: Column `business_unit_description` produced by the scheduled materialization query.
+  payment_model:
+    description: Column `payment_model` produced by the scheduled materialization query.
+  sale_price_agreed:
+    description: Column `sale_price_agreed` produced by the scheduled materialization query.
+  brokerage_fee:
+    description: Column `brokerage_fee` produced by the scheduled materialization query.
+  dt_sale_agreement_signed:
+    description: Column `dt_sale_agreement_signed` produced by the scheduled materialization query.
+  dt_accounting_entry:
+    description: Column `dt_accounting_entry` produced by the scheduled materialization query.
+  dt_reference_ledger:
+    description: Column `dt_reference_ledger` produced by the scheduled materialization query.
+  dt_legal_analysis:
+    description: Column `dt_legal_analysis` produced by the scheduled materialization query.
+  dt_cancelled:
+    description: Column `dt_cancelled` produced by the scheduled materialization query.
+  offer_cancelled:
+    description: Column `offer_cancelled` produced by the scheduled materialization query.
+  cancellation_brokerage:
+    description: Column `cancellation_brokerage` produced by the scheduled materialization query.
+  dt_payment_allowed:
+    description: Column `dt_payment_allowed` produced by the scheduled materialization query.
+  supply_x_demand:
+    description: Column `supply_x_demand` produced by the scheduled materialization query.
+  location:
+    description: Column `location` produced by the scheduled materialization query.
+  cost_center:
+    description: Column `cost_center` produced by the scheduled materialization query.
+  is_legal_entity:
+    description: Column `is_legal_entity` produced by the scheduled materialization query.
+  is_contract_amendment:
+    description: Column `is_contract_amendment` produced by the scheduled materialization query.
+  gross_brokerage_amount:
+    description: Column `gross_brokerage_amount` produced by the scheduled materialization query.
+  partner_fee_value_demand:
+    description: Column `partner_fee_value_demand` produced by the scheduled materialization query.
+  brokerage_amount:
+    description: Column `brokerage_amount` produced by the scheduled materialization query.
+  brokerage_quinto_andar_amount:
+    description: Column `brokerage_quinto_andar_amount` produced by the scheduled materialization query.
+  brokerage_estate_agent_amount:
+    description: Column `brokerage_estate_agent_amount` produced by the scheduled materialization query.
+  total_received:
+    description: Column `total_received` produced by the scheduled materialization query.
+  broker_payment:
+    description: Column `broker_payment` produced by the scheduled materialization query.
+  broker_discount:
+    description: Column `broker_discount` produced by the scheduled materialization query.
+  invoice_amount_current_period:
+    description: Column `invoice_amount_current_period` produced by the scheduled materialization query.
+  invoice_amount:
+    description: Column `invoice_amount` produced by the scheduled materialization query.
+  band_aid_cost:
+    description: Column `band_aid_cost` produced by the scheduled materialization query.
+  broker_payment_platform:
+    description: Column `broker_payment_platform` produced by the scheduled materialization query.
+  broker_payment_rede_ti:
+    description: Column `broker_payment_rede_ti` produced by the scheduled materialization query.
+  accounting_receivables:
+    description: Column `accounting_receivables` produced by the scheduled materialization query.
+  accounting_brokerage_provision:
+    description: Column `accounting_brokerage_provision` produced by the scheduled materialization query.
+  accounting_cancellation_receivables:
+    description: Column `accounting_cancellation_receivables` produced by the scheduled materialization query.
+  accounting_advance_broker_payment:
+    description: Column `accounting_advance_broker_payment` produced by the scheduled materialization query.
+  accounting_advance_buyer_payment:
+    description: Column `accounting_advance_buyer_payment` produced by the scheduled materialization query.
+  accounting_buyer_amount_to_transfer:
+    description: Column `accounting_buyer_amount_to_transfer` produced by the scheduled materialization query.
+  accounting_broker_amount_to_transfer:
+    description: Column `accounting_broker_amount_to_transfer` produced by the scheduled materialization query.
+  accounting_brokerage_revenue:
+    description: Column `accounting_brokerage_revenue` produced by the scheduled materialization query.
+  accounting_cancellation_revenue:
+    description: Column `accounting_cancellation_revenue` produced by the scheduled materialization query.
+  accounting_total_loss:
+    description: Column `accounting_total_loss` produced by the scheduled materialization query.
+  accounting_band_aid_cost:
+    description: Column `accounting_band_aid_cost` produced by the scheduled materialization query.
+  loss_adjust_invoice_current_period:
+    description: Column `loss_adjust_invoice_current_period` produced by the scheduled materialization query.
+  accounting_cancellation_revenue_previous_period:
+    description: Column `accounting_cancellation_revenue_previous_period` produced by the scheduled materialization query.
+  accounting_total_loss_previous_period:
+    description: Column `accounting_total_loss_previous_period` produced by the scheduled materialization query.
+  loss_adjust_invoice_previous_period:
+    description: Column `loss_adjust_invoice_previous_period` produced by the scheduled materialization query.
+  loss_overpayment_previous_period:
+    description: Column `loss_overpayment_previous_period` produced by the scheduled materialization query.
+  adjust_underpayment_previous_period:
+    description: Column `adjust_underpayment_previous_period` produced by the scheduled materialization query.

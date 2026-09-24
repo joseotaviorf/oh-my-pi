@@ -1,0 +1,13 @@
+dag:
+  name: enrich_luigijr_recon_for_sale_output_layer
+  owner: Ops Fintech
+  tags:
+  - luigi
+  - luigi-type:materialization
+  - generated-by:lucas.prado
+  dataset_dependencies:
+  - ops_fintech.recon_for_sale_input_layer:first-run-of-day
+workflow:
+  type: query_delta
+  layer: consumption
+  custom_schema: ops_fintech
