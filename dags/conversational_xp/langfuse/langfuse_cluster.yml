@@ -14,6 +14,8 @@ cluster:
       availability: ON_DEMAND
     spark_conf:
       spark.driver.maxResultSize: '0'
+      spark.executor.memory: 32g
+      spark.dynamicAllocation.maxExecutors: '10'
     task_nodes:
       target_on_demand: 5
       target_spot: 0
