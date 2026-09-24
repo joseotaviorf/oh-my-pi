@@ -29,7 +29,6 @@ workflow:
     boleto_user:
       clean_table_name: invoice_user
     boleto_user_issuer:
-      criticality: Critical
       clean_table_name: invoice_user_issuer
     condo_monitoring_actions: {}
     condo_monitoring_eligibility: {}

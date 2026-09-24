@@ -22,7 +22,6 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     offer:
-      criticality: Critical
       clean_table_name: offer
       raw_primary_keys: [id]
       clean_primary_keys: [id]

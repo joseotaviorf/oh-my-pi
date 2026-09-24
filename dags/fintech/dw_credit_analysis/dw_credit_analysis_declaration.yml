@@ -13,7 +13,6 @@ workflow:
     dim_drop_reason:
       custom_schema: public
     fact_proposal_credit_flows:
-      criticality: Critical
       sla_deadline_localtime: "11:00"
   inner_dependencies:
     fact_proposal_credit_flows:

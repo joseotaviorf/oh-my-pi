@@ -1191,7 +1191,7 @@ class TestDAGDeclarationValidatorCriticality:
         }
         with pytest.raises(
             AssertionError,
-            match=r"declares criticality: Critical \(found on \['dag'\]\) without freshness_max_staleness_minutes",
+            match=r"cannot declare criticality: Critical \(found on \['dag'\]\)",
         ):
             dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
@@ -1212,7 +1212,7 @@ class TestDAGDeclarationValidatorCriticality:
         }
         with pytest.raises(
             AssertionError,
-            match=r"declares criticality: Critical \(found on \['account'\]\) without freshness_max_staleness_minutes",
+            match=r"cannot declare criticality: Critical \(found on \['account'\]\)",
         ):
             dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
@@ -1233,7 +1233,7 @@ class TestDAGDeclarationValidatorCriticality:
             dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
         )
 
-    def test_validate_fast_lane_critical_table_with_staleness_accepts(
+    def test_validate_freshness_dag_critical_table_raises(
         self, dag_declaration_validator
     ):
         dag_declaration = {
@@ -1243,15 +1243,145 @@ class TestDAGDeclarationValidatorCriticality:
                 "tables_customization": {"account": {"criticality": "Critical"}},
             },
             "dag": {
-                "name": "retsuko_fast_lane",
+                "name": "any_dag_name",
                 "owner": "Data Engineering",
                 "criticality": "High",
                 "freshness_max_staleness_minutes": 90,
             },
         }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot declare criticality: Critical \(found on \['account'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_critical_dag_deadline_after_eight_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+                "sla_deadline_localtime": "09:00",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"after 08:00 \(found on \['dag'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_critical_table_deadline_after_eight_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {
+                    "fact_x": {
+                        "criticality": "Critical",
+                        "sla_deadline_localtime": "11:00",
+                    }
+                },
+            },
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "High",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"\['fact_x'\]",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_table_inheriting_critical_with_late_deadline_raises(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {
+                    "fact_x": {
+                        "sla_deadline_localtime": "09:00",
+                    }
+                },
+            },
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"\['fact_x'\]",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
+
+    def test_validate_critical_deadline_at_eight_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {
+                "type": "query",
+                "layer": "dw",
+                "tables_customization": {
+                    "fact_x": {
+                        "criticality": "Critical",
+                        "sla_deadline_localtime": "08:00",
+                    }
+                },
+            },
+            "dag": {
+                "name": "any_dag_name",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+                "sla_deadline_localtime": "08:00",
+            },
+        }
         assert (
             dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
         )
+
+    def test_validate_late_critical_deadline_exempt_dag_accepts(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "dw_bpo_performance",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+                "sla_deadline_localtime": "11:00",
+            },
+        }
+        assert (
+            dag_declaration_validator.validate(dag_declaration=dag_declaration) is None
+        )
+
+    def test_validate_exempt_dag_still_rejects_freshness_critical(
+        self, dag_declaration_validator
+    ):
+        dag_declaration = {
+            "workflow": {"type": "query", "layer": "dw"},
+            "dag": {
+                "name": "dw_bpo_performance",
+                "owner": "Data Engineering",
+                "criticality": "Critical",
+                "freshness_max_staleness_minutes": 90,
+            },
+        }
+        with pytest.raises(
+            AssertionError,
+            match=r"cannot declare criticality: Critical \(found on \['dag'\]\)",
+        ):
+            dag_declaration_validator.validate(dag_declaration=dag_declaration)
 
     def test_validate_freshness_window_without_staleness_raises(
         self, dag_declaration_validator

@@ -6,9 +6,6 @@ dag:
   criticality: High
   sla_deadline_localtime: "11:00"
 workflow:
-  tables_customization:
-    invoice_all:
-      criticality: Critical
   type: query_delta
   layer: enrich
   inner_dependencies:

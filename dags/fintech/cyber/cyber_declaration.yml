@@ -90,7 +90,6 @@ workflow:
         - "[]"
     uda1:
       clean_table_name: contracts
-      criticality: Critical
       sla_deadline_localtime: "11:00"
       extraction_type: full
       partitions: []
@@ -164,7 +163,6 @@ workflow:
         - "[]"
     agency:
       clean_table_name: agency
-      criticality: Critical
       sla_deadline_localtime: "11:00"
       extraction_type: full
       partitions: []

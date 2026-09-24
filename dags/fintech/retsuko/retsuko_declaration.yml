@@ -33,7 +33,6 @@ workflow:
     early_termination_fee: {}
     early_termination_version: {}
     entry:
-      criticality: Critical
       sla_deadline_localtime: "09:00"
     file: {}
     invoice_partitioned: {}
@@ -47,5 +46,4 @@ workflow:
     recurring_expense: {}
     recurring_expense_entry: {}
     sap_entity:
-      criticality: Critical
       sla_deadline_localtime: "09:00"

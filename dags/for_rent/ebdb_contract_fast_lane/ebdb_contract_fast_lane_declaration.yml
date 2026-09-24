@@ -20,7 +20,6 @@ workflow:
   execution_timeout_hours: 0.5
   tables_customization:
     Contrato:
-      criticality: Critical
       clean_table_name: contract
       clean_primary_keys: [id]
       clean_z_order_by: [id_user, id_house]

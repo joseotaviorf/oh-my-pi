@@ -24,17 +24,14 @@ workflow:
   dbutils_secret_key: RETSUKO_DB
   tables_customization:
     account:
-      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: account
       clean_z_order_by: [ id_contract ]
     contract:
-      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: contract
       clean_z_order_by: [ ts_signature ]
     invoice:
-      criticality: Critical
       clean_primary_keys: [ id ]
       clean_table_name: invoice
       clean_z_order_by: [ id_contract, ts_due ]

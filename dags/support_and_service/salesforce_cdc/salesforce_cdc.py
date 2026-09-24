@@ -273,7 +273,6 @@ def wire_event_lineage(execute_job_cluster, event: str, end_cluster, pool: str):
                 "layer": "clean",
                 "bucket": bucket,
                 "storage_format": StorageFormatEnum.PARQUET.value,
-                "criticality": "Critical",
             }
         )
     # Clean still emits its own dataset for downstream consumers. Core Support
@@ -382,7 +381,7 @@ with DAG(
         "SST",
         "SF",
         "salesforce",
-        "criticality:Critical",
+        "criticality:High",
         "sla_deadline_localtime:08:00",
     ],
     on_failure_callback=gchat_callback.dag_failure_alert,

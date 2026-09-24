@@ -222,22 +222,15 @@ class TableAttributes:
             "criticality"
         )
         resolved = CriticalityEnum.parse(declared, context=f"table {self.table_name!r}")
-        if resolved == CriticalityEnum.CRITICAL:
+        if resolved == CriticalityEnum.CRITICAL and self._is_staging_copy():
             dag_name = self._dag_args.get("name", "") if self._dag_args else ""
-            if "fast_lane" in dag_name and not (self._dag_args or {}).get(
-                "freshness_max_staleness_minutes"
-            ):
-                return CriticalityEnum.HIGH
-
-            if self._is_staging_copy():
-                dag_criticality = CriticalityEnum.parse(
-                    (self._dag_args or {}).get("criticality"),
-                    context=f"dag {dag_name!r}",
-                )
-                if dag_criticality != CriticalityEnum.CRITICAL:
-                    return dag_criticality
-                return CriticalityEnum.MEDIUM
-
+            dag_criticality = CriticalityEnum.parse(
+                (self._dag_args or {}).get("criticality"),
+                context=f"dag {dag_name!r}",
+            )
+            if dag_criticality != CriticalityEnum.CRITICAL:
+                return dag_criticality
+            return CriticalityEnum.MEDIUM
         return resolved
 
     def _get_sla_deadline_localtime(self) -> Optional[str]:
