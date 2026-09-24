@@ -28,7 +28,9 @@ class DatabricksIncidentContextEnricher(IncidentContextEnricher):
             service = DatabricksMetadataService.from_airflow_context(
                 context, self.databricks_conn_id
             )
-            databricks_context = service.get_databricks_incident_context()
+            databricks_context = (
+                service.get_databricks_incident_context() if service else None
+            )
         except Exception as err:
             logger.warning(
                 "Could not retrieve Databricks context for alert enrichment: %s",

@@ -1,5 +1,6 @@
 """Tests for DatabricksIncidentContextEnricher."""
 
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher import (
@@ -119,3 +120,18 @@ class TestDatabricksIncidentContextEnricher:
         assert "Error: Error message" in out_desc
         assert "Run URL:" not in out_desc
         assert "Cluster Logs:" not in out_desc
+
+    def test_enrich_skips_silently_when_task_has_no_run_page_url(self):
+        enricher = DatabricksIncidentContextEnricher()
+        context = {
+            "dag_run": SimpleNamespace(dag_id="bietlejuice.emr_dag"),
+            "task_instance": MagicMock(xcom_pull=MagicMock(return_value=None)),
+        }
+
+        with patch(
+            "bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher.logger"
+        ) as logger:
+            result = enricher.enrich(context, {"DAG": "emr_dag"}, "Original")
+
+        assert result == ({"DAG": "emr_dag"}, "Original")
+        logger.warning.assert_not_called()

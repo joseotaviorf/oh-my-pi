@@ -41,11 +41,16 @@ class DatabricksMetadataService:
     @classmethod
     def from_airflow_context(
         cls, airflow_context: Context, databricks_conn_id: str
-    ) -> "DatabricksMetadataService":
-        """Factory method to create an instance from an Airflow context."""
+    ) -> Optional["DatabricksMetadataService"]:
+        """Factory method to create an instance from an Airflow context.
+
+        Returns None for tasks without a Databricks run.
+        """
         dag_id = airflow_context.get("dag_run").dag_id
         task_instance = airflow_context.get("task_instance")
         databricks_run_url = task_instance.xcom_pull(key="run_page_url")
+        if not databricks_run_url:
+            return None
         databricks_run_id = cls._extract_run_id_from_url(
             url=databricks_run_url, dag_id=dag_id
         )
