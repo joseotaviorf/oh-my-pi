@@ -1,0 +1,351 @@
+---
+database_name: datalake_search
+table_name: concierge_user_daily
+owner: akira@quintoandar.com.br
+domain: Conversational XP
+description: |
+  Concierge audience rebuilt from the prepared concierge fact snapshots. One
+  row per audience user per snapshot day, aggregating top-of-funnel events, the
+  HLS search cluster and WhatsApp send history, visits, rent offers, chat
+  history and privacy purposes, and deciding the concierge intent tier from
+  those signals. Replaces concierge_users, which derived the same decision from
+  raw sources; the two run in parallel until consumers migrate.
+
+  This table deliberately carries no identity or eligibility data: no phone
+  number, no name, and no agent, owner, active-contract or buyer-company
+  exclusions. It is not directly sendable. Sending consumers join identity and
+  apply eligibility downstream. Partitioned by snapshot year, month and day and
+  Z-ordered by id_user; filter by the partition columns for daily reads.
+columns:
+  id_user:
+    description: "Audience user, present when the user showed any concierge-relevant behaviour today. Z-order key for user-level data skipping."
+    lineage:
+      - datalake_search.concierge_tof_events.id_user
+      - datalake_search.concierge_hls_user_daily.id_user
+      - datalake_search.concierge_visit_user_daily.id_user
+      - datalake_search.concierge_offer_user_daily.id_user
+      - datalake_search.concierge_chat_history_user_daily.id_user
+  id_person:
+    description: "Person UUID for the user, resolved from the top-of-funnel rollup, then the visit snapshot, then the privacy snapshot. Null when no fact snapshot carries a person mapping. Used to join person-grain concierge tables downstream."
+    lineage:
+      - datalake_search.concierge_tof_events.id_person
+      - datalake_search.concierge_visit_user_daily.id_person
+      - datalake_search.concierge_privacy_user.id_person
+  id_device:
+    description: "Latest anonymous device identifier seen on the user's top-of-funnel events."
+    lineage:
+      - datalake_search.concierge_tof_events.id_device
+  business_context:
+    description: "RENT or SALE context for the audience row, taken from the search-cluster cost type and falling back to whichever context the user searched more in the last 60 days. Null when neither source resolves a context."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cost_type
+      - datalake_search.concierge_tof_events.qty_search_rent_60d
+      - datalake_search.concierge_tof_events.qty_search_sale_60d
+  intent:
+    description: "Concierge intent tier decided by this table: HIGH for a single confirmed next-day visit, MEDIUM for a qualifying intent signal, LOW for a search-cluster or catch-all candidate, and NOT_CLASSIFIED when the user is suppressed, blocked or inside a send cooldown."
+    lineage:
+      - datalake_search.concierge_privacy_user.is_concierge_privacy_suppressed
+      - datalake_search.concierge_hls_user_daily.is_whatsapp_blocked
+      - datalake_search.concierge_hls_user_daily.qty_high_7d
+      - datalake_search.concierge_hls_user_daily.qty_med_7d
+      - datalake_search.concierge_hls_user_daily.qty_low_7d
+      - datalake_search.concierge_hls_user_daily.qty_low_lifetime
+      - datalake_search.concierge_visit_user_daily.qty_visits_tomorrow
+      - datalake_search.concierge_offer_user_daily.has_rent_offer_1d
+      - datalake_search.concierge_tof_events.qty_schedule_page_1d
+      - datalake_search.concierge_tof_events.qty_favorites_1d
+      - datalake_search.concierge_tof_events.qty_lpv_3d
+      - datalake_search.concierge_tof_events.qty_search_sessions_60d
+      - datalake_search.concierge_chat_history_user_daily.qty_chat_messages_28d
+      - datalake_search.concierge_hls_user_daily.cluster_events_count
+  reason:
+    description: "Why the intent tier was assigned: MEETS_CONDITIONS, PRIVACY_SUPPRESSED, PRIVACY_STATE_UNKNOWN, WHATSAPP_BLOCKED, a HIGH/MED/LOW_INTENT_MSG_RECEIVED cooldown, REPETITION_CONTROL, LOW_SEARCHES_AFTER_SNOOZE, or CATCH_ALL."
+    lineage:
+      - datalake_search.concierge_privacy_user.is_concierge_privacy_suppressed
+      - datalake_search.concierge_privacy_user.snooze_concierge_status
+      - datalake_search.concierge_hls_user_daily.is_whatsapp_blocked
+      - datalake_search.concierge_hls_user_daily.qty_high_7d
+      - datalake_search.concierge_hls_user_daily.qty_med_7d
+      - datalake_search.concierge_hls_user_daily.qty_low_7d
+      - datalake_search.concierge_hls_user_daily.qty_low_lifetime
+      - datalake_search.concierge_visit_user_daily.qty_visits_tomorrow
+      - datalake_search.concierge_chat_history_user_daily.qty_chat_messages_28d
+      - datalake_search.concierge_tof_events.qty_search_sessions_60d
+      - datalake_search.concierge_hls_user_daily.cluster_events_count
+  medium_intent_reason:
+    description: "Signal that qualified a MEDIUM user, highest priority first: DIRECT_OFFER, SCHEDULE_PAGE_VIEWED, FAVORITED_LISTING, THREE_PLUS_LPV. Null for other tiers and for suppressed or cooling-down users."
+    lineage:
+      - datalake_search.concierge_offer_user_daily.has_rent_offer_1d
+      - datalake_search.concierge_tof_events.qty_schedule_page_1d
+      - datalake_search.concierge_tof_events.qty_favorites_1d
+      - datalake_search.concierge_tof_events.qty_lpv_3d
+  id_house_target:
+    description: "House the concierge message should reference: the next visit's house for HIGH, otherwise the house behind the qualifying MEDIUM signal. Null when the tier implies no target house."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.id_house_next_visit
+      - datalake_search.concierge_offer_user_daily.id_house_last_offer
+      - datalake_search.concierge_tof_events.id_house_last_schedule
+      - datalake_search.concierge_tof_events.id_house_last_favorite
+      - datalake_search.concierge_tof_events.id_house_last_lpv
+  visit_code_target:
+    description: "Visit code of the confirmed next-day visit for HIGH intent users. Null for other tiers."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.visit_code_next
+  has_top_cluster:
+    description: "Whether the user has a winning HLS search-profile cluster today, the LOW intent condition."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_events_count
+  has_qualified_search_cluster:
+    description: "Whether the winning search cluster reached the ten-event qualifying threshold."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_events_count
+  is_first_notification:
+    description: "Whether the user has never received a concierge notification of any tier."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_low_lifetime
+      - datalake_search.concierge_hls_user_daily.qty_med_lifetime
+      - datalake_search.concierge_hls_user_daily.qty_high_lifetime
+  cluster_events_count:
+    description: "Event count on the winning search-profile filter row."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_events_count
+  cluster_city:
+    description: "City of the winning search cluster."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_city
+  cluster_neighborhoods:
+    description: "Neighborhoods of the winning search cluster."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_neighborhoods
+  cluster_max_price:
+    description: "Maximum price of the winning search cluster."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_max_price
+  cluster_bedrooms:
+    description: "Minimum bedrooms of the winning search cluster."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.cluster_bedrooms
+  ts_profile_updated:
+    description: "When the winning search-profile filter row was last updated."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.ts_profile_updated
+  snooze_concierge_status:
+    description: "Raw SNOOZE_CONCIERGE purpose status, such as ACTIVE or EXPIRED. Null when the user expressed no snooze purpose."
+    lineage:
+      - datalake_search.concierge_privacy_user.snooze_concierge_status
+  tenant_message_ai_informative_status:
+    description: "Raw TENANT_MESSAGE_AI_INFORMATIVE purpose status. Null when the user never expressed the purpose."
+    lineage:
+      - datalake_search.concierge_privacy_user.tenant_message_ai_informative_status
+  ts_snooze_concierge_updated:
+    description: "When the SNOOZE_CONCIERGE purpose was last updated in Privacy Hub."
+    lineage:
+      - datalake_search.concierge_privacy_user.ts_snooze_concierge_updated
+  ts_tenant_message_ai_informative_updated:
+    description: "When the TENANT_MESSAGE_AI_INFORMATIVE purpose was last updated in Privacy Hub."
+    lineage:
+      - datalake_search.concierge_privacy_user.ts_tenant_message_ai_informative_updated
+  is_snooze_concierge_active:
+    description: "Whether the user's person currently has an active concierge snooze. Null when the person could not be resolved, meaning the privacy state is unknown."
+    lineage:
+      - datalake_search.concierge_privacy_user.is_snooze_concierge_active
+  is_tenant_message_ai_informative_withdrawn:
+    description: "Whether the user's person withdrew consent for AI informative tenant messages. Null when the privacy state is unknown."
+    lineage:
+      - datalake_search.concierge_privacy_user.is_tenant_message_ai_informative_withdrawn
+  is_concierge_privacy_suppressed:
+    description: "Whether either privacy purpose suppresses concierge outreach for this person. Joined person to person so linked accounts of a snoozed person are suppressed too. Null when the person could not be resolved: the intent tier then falls to NOT_CLASSIFIED with reason PRIVACY_STATE_UNKNOWN and consumers must not send."
+    lineage:
+      - datalake_search.concierge_privacy_user.is_concierge_privacy_suppressed
+  qty_low_7d:
+    description: "Concierge low-intent WhatsApp sends in the last seven days, the low-tier cooldown input."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_low_7d
+  qty_med_7d:
+    description: "Concierge medium-intent WhatsApp sends in the last seven days, the medium-tier cooldown input."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_med_7d
+  qty_high_7d:
+    description: "Concierge high-intent WhatsApp sends in the last seven days, the high-tier cooldown input."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_high_7d
+  qty_low_lifetime:
+    description: "Lifetime concierge low-intent WhatsApp sends."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_low_lifetime
+  qty_med_lifetime:
+    description: "Lifetime concierge medium-intent WhatsApp sends."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_med_lifetime
+  qty_high_lifetime:
+    description: "Lifetime concierge high-intent WhatsApp sends."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.qty_high_lifetime
+  ts_last_low:
+    description: "Timestamp of the most recent concierge low-intent send."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.ts_last_low
+  ts_last_med:
+    description: "Timestamp of the most recent concierge medium-intent send."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.ts_last_med
+  ts_last_high:
+    description: "Timestamp of the most recent concierge high-intent send."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.ts_last_high
+  last_template_family:
+    description: "Intent family of the most recent concierge send: HIGH, MEDIUM or LOW."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.last_template_family
+  ts_last_shared_lpv_ads:
+    description: "Timestamp of the most recent shared LPV-ads trigger send."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.ts_last_shared_lpv_ads
+  is_whatsapp_blocked:
+    description: "Whether the user's number recorded a WhatsApp delivery block in the last 180 days. Blocked users are never classified for a send."
+    lineage:
+      - datalake_search.concierge_hls_user_daily.is_whatsapp_blocked
+  qty_visits_tomorrow:
+    description: "Active visits scheduled for the next calendar day. Exactly one is the HIGH intent condition."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_tomorrow
+  qty_visits_7d:
+    description: "Visits scheduled for the next seven calendar days."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_7d
+  qty_visits_canceled_1d:
+    description: "Visits canceled on the previous calendar day."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_canceled_1d
+  qty_visits_canceled_7d:
+    description: "Visits canceled in the previous seven complete calendar days."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_canceled_7d
+  qty_visits_rescheduled_1d:
+    description: "Visits rescheduled on the previous calendar day."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_rescheduled_1d
+  qty_visits_rescheduled_7d:
+    description: "Visits rescheduled in the previous seven complete calendar days."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.qty_visits_rescheduled_7d
+  id_house_next_visit:
+    description: "House of the soonest future active visit."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.id_house_next_visit
+  visit_code_next:
+    description: "Visit code of the soonest future active visit."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.visit_code_next
+  ts_next_visit:
+    description: "Scheduled timestamp of the soonest future active visit."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.ts_next_visit
+  id_house_last_canceled_1d:
+    description: "House of the visit most recently cancelled on the previous calendar day."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.id_house_last_canceled_1d
+  visit_code_last_canceled_1d:
+    description: "Visit code of the visit most recently cancelled on the previous calendar day."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.visit_code_last_canceled_1d
+  array_id_house_visit_open_or_done:
+    description: "Comma-separated houses the user has an open or completed visit for, used to avoid recommending an already visited house."
+    lineage:
+      - datalake_search.concierge_visit_user_daily.array_id_house_visit_open_or_done
+  has_rent_offer_1d:
+    description: "Whether the user submitted a rent offer yesterday, the highest-priority MEDIUM qualifier."
+    lineage:
+      - datalake_search.concierge_offer_user_daily.has_rent_offer_1d
+  has_rent_offer_7d:
+    description: "Whether the user submitted a rent offer in the last seven days."
+    lineage:
+      - datalake_search.concierge_offer_user_daily.has_rent_offer_7d
+  id_house_last_offer:
+    description: "House of the user's most recent submitted rent offer."
+    lineage:
+      - datalake_search.concierge_offer_user_daily.id_house_last_offer
+  ts_last_offer:
+    description: "Timestamp of the user's most recent submitted rent offer."
+    lineage:
+      - datalake_search.concierge_offer_user_daily.ts_last_offer
+  qty_chat_messages_7d:
+    description: "Concierge WhatsApp chat messages the user sent in the last seven days."
+    lineage:
+      - datalake_search.concierge_chat_history_user_daily.qty_chat_messages_7d
+  qty_chat_messages_28d:
+    description: "Concierge WhatsApp chat messages the user sent in the last 28 days. Zero is the engagement condition for repetition control."
+    lineage:
+      - datalake_search.concierge_chat_history_user_daily.qty_chat_messages_28d
+  ts_last_chat_message:
+    description: "Timestamp of the user's most recent concierge WhatsApp chat message."
+    lineage:
+      - datalake_search.concierge_chat_history_user_daily.ts_last_chat_message
+  qty_search_sessions_7d:
+    description: "Distinct search sessions in the last seven days."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_search_sessions_7d
+  qty_search_sessions_60d:
+    description: "Distinct search sessions in the last 60 days, used to re-qualify users whose snooze expired."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_search_sessions_60d
+  qty_search_rent_60d:
+    description: "Distinct rent-context search sessions in the last 60 days."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_search_rent_60d
+  qty_search_sale_60d:
+    description: "Distinct sale-context search sessions in the last 60 days."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_search_sale_60d
+  qty_lpv_3d:
+    description: "Listing page views in the last three days. Three or more is a MEDIUM qualifier."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_lpv_3d
+  qty_houses_lpv_3d:
+    description: "Distinct houses viewed in the last three days."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_houses_lpv_3d
+  array_id_house_top_5_lpv_3d:
+    description: "Top five most-viewed houses in the last three days, used to pick recommendation content."
+    lineage:
+      - datalake_search.concierge_tof_events.array_id_house_top_5_lpv_3d
+  qty_favorites_1d:
+    description: "Listings favourited yesterday, a MEDIUM qualifier."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_favorites_1d
+  qty_favorites_7d:
+    description: "Listings favourited in the last seven days."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_favorites_7d
+  qty_schedule_page_1d:
+    description: "Schedule page views yesterday, a MEDIUM qualifier."
+    lineage:
+      - datalake_search.concierge_tof_events.qty_schedule_page_1d
+  id_house_last_lpv:
+    description: "House of the user's most recent listing page view."
+    lineage:
+      - datalake_search.concierge_tof_events.id_house_last_lpv
+  id_house_last_favorite:
+    description: "House of the user's most recent favourite."
+    lineage:
+      - datalake_search.concierge_tof_events.id_house_last_favorite
+  id_house_last_schedule:
+    description: "House of the user's most recent schedule page view."
+    lineage:
+      - datalake_search.concierge_tof_events.id_house_last_schedule
+  dt_last_search:
+    description: "Date of the user's most recent search event."
+    lineage:
+      - datalake_search.concierge_tof_events.dt_last_search
+  ts_last_lpv:
+    description: "Timestamp of the user's most recent listing page view."
+    lineage:
+      - datalake_search.concierge_tof_events.ts_last_lpv
+  ts_load:
+    description: "Timestamp when this snapshot row was written."
+  year:
+    description: "Snapshot year partition."
+  month:
+    description: "Snapshot month partition."
+  day:
+    description: "Snapshot day partition."

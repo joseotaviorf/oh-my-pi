@@ -2123,6 +2123,13 @@ bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow:first-run-of-day
   - bietlejuice.house_listing_search:load-clean-recommendation-use-case:first-run-of-day
   - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case:first-run-of-day
+bietlejuice.enrich_concierge_user_daily:
+  - bietlejuice.enrich_concierge_chat_history:load-enrich-concierge-chat-history-user-daily:first-run-of-day
+  - bietlejuice.enrich_concierge_hls_facts:load-enrich-concierge-hls-user-daily:first-run-of-day
+  - bietlejuice.enrich_concierge_offer_facts:load-enrich-concierge-offer-user-daily:first-run-of-day
+  - bietlejuice.enrich_concierge_privacy_facts:load-enrich-concierge-privacy-user:first-run-of-day
+  - bietlejuice.enrich_concierge_tof_events:load-enrich-concierge-tof-events:first-run-of-day
+  - bietlejuice.enrich_concierge_visit_facts:load-enrich-concierge-visit-user-daily:first-run-of-day
 bietlejuice.enrich_concierge_visit_facts:
   - bietlejuice.enrich_transactional_entities:load-enrich-entities:first-run-of-day
 bietlejuice.enrich_condo_monitoring:

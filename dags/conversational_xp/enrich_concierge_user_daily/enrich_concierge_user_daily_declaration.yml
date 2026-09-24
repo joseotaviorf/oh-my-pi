@@ -1,0 +1,41 @@
+dag:
+  name: enrich_concierge_user_daily
+  schedule_start_date: 2026, 9, 18
+  owner: Data Conversational XP
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Concierge audience rebuilt from the prepared concierge fact snapshots.
+      The DAG aggregates the six behaviour ETLs — top-of-funnel events, the HLS
+      search cluster and WhatsApp send history, visits, rent offers, chat
+      history and privacy purposes — and decides the concierge intent tier from
+      those signals alone.
+
+      This replaces enrich_concierge_audience, which derives the same decision
+      by re-reading raw sources. The two run in parallel until consumers
+      migrate; nothing here reads concierge_users.
+
+      Grain is one row per audience user per snapshot day. The DAG is
+      dataset-triggered from the six upstream fact DAGs, so it runs once the
+      current snapshot is complete rather than on a fixed clock.
+
+      Scope note: the table carries behaviour and the intent decision only. It
+      holds no phone number, no name, and none of the agent, owner,
+      active-contract or buyer-company eligibility exclusions, so it is not
+      directly sendable — sending consumers join identity and apply eligibility
+      downstream.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+  tables_customization:
+    concierge_user_daily:
+      merge_on: [id_user, year, month, day]
+      when_not_matched_by_source_delete_condition: |
+        target.year = YEAR(CURRENT_DATE())
+        AND target.month = MONTH(CURRENT_DATE())
+        AND target.day = DAY(CURRENT_DATE())
+      partitions: [year, month, day]
+      z_order_by: [id_user]
