@@ -7,7 +7,7 @@ description: |
   Raw layer for the DAG-run-to-dataset-event junction table extracted from the Astronomer (Astro)
   production Airflow internal metadata database. One row per link between a dataset-triggered DAG
   run and the dataset update event that satisfied its scheduling condition. Grain is the composite
-  of dag_run_id and event_id per export batch. Landed before clean renaming to id_run and
+  of dag_run_id and event_id per extraction window (day the linked DAG run was queued). Landed before clean renaming to id_run and
   id_event. Consumed by the astro clean transform and by Data Platform observability pipelines
   tracing dataset-aware scheduling causality. Partitioned by year, month, and day at the raw
   bucket layout. Downstream clean queries should always filter year, month, and day for pruning.
