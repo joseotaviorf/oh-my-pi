@@ -118,6 +118,16 @@ lpv_priced AS (
     WHERE lpv_aux.business_context IS NOT NULL
         AND house.city IS NOT NULL AND house.city <> ''
         AND house.region_name IS NOT NULL AND house.region_name <> '' AND house.region_name <> 'A Definir Em Campo'
+        -- Only currently-available listings: the viewed house may have been sold /
+        -- suspended / unpublished since the LPV, so require a published status and
+        -- the flag matching the viewed context. Applied here (pre-ranking) so an
+        -- unavailable top listing can't hide a qualifying available one. Note the
+        -- ebdb house.status enum is Portuguese ('publicado', not 'PUBLISHED').
+        AND house.status = 'publicado'
+        AND (
+            (lpv_aux.business_context = 'sale' AND house.is_for_sale = TRUE)
+            OR (lpv_aux.business_context = 'rent' AND house.is_for_rent = TRUE)
+        )
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 lpv_users AS (

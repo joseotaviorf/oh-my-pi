@@ -147,6 +147,10 @@ recent_lpv_trigger AS (
         AND id_user IS NOT NULL
 ),
 house_on_sale AS (
+    -- Only currently-available sale listings: a positive sale price is not
+    -- enough (a sold/suspended/unpublished house can still carry one), so we
+    -- also require the sale flag and a published listing status. Note the
+    -- ebdb house.status enum is Portuguese ('publicado', not 'PUBLISHED').
     SELECT
         TRY_CAST(id AS BIGINT) AS id_house,
         city,
@@ -156,6 +160,8 @@ house_on_sale AS (
         datalake_ebdb_clean.house
     WHERE
         sale_price > 0
+        AND is_for_sale = TRUE
+        AND status = 'publicado'
 ),
 lpv_ads_eligible_today AS (
     -- Cross-exclusion: users already eligible today for the Shared/Retargeting
