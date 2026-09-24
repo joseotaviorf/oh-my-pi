@@ -86,10 +86,11 @@ exceptions:
   - dag: braze_events
     path: dags/support_and_service/braze_events
     reason: >-
-      Temporary EMR→Databricks revert for performance: the load-raw-events-*
-      tasks do not complete on the EMR fleet (still running after ~1h30 on the
-      2026-08-18 prod run, no terminal state). Returns to EMR once the raw
-      ingestion is optimized.
+      EMR→Databricks rollback for on-call stability. On the 2026-09-23 prod
+      run the multi-node memory fleet still left load-raw-events-owners and
+      load-raw-events-tenants running for about two hours. Prod stays on
+      consolidation_s_memory_single_node_cluster until the raw ingestion
+      finishes reliably on EMR.
     approved_by: eduardo.soares@quintoandar.com.br
   - dag: enrich_vespucio_images_upsert_backlog
     path: dags/atlas_db/enrich_vespucio_images_upsert_backlog
