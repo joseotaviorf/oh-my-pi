@@ -238,6 +238,7 @@ job_with_salary_table_effective AS (
         )) AS sk_job_version,
         id_job,
         band,
+        salary_range_mid,
         target_rvv,
         target_sop,
         target_hiring_sop,
