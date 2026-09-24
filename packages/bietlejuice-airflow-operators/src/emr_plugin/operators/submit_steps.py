@@ -250,7 +250,11 @@ class QuintoAndarEmrSubmitStepsOperator(EmrAddStepsOperator):
     ) -> None:
         if not job_flow_id or not step_ids:
             return
-        log_uri = get_cluster_log_uri(self.hook.conn, job_flow_id)
+        log_uri = get_cluster_log_uri(
+            self.hook.conn,
+            job_flow_id,
+            fallback_log_uri=self._resolve_log_uri(context["ti"]),
+        )
         if not log_uri:
             return
         context["ti"].xcom_push(key=EMR_LOG_URI_XCOM_KEY, value=log_uri)
@@ -263,12 +267,12 @@ class QuintoAndarEmrSubmitStepsOperator(EmrAddStepsOperator):
         context["ti"].xcom_push(key=EMR_STEP_LOGS_XCOM_KEY, value=url)
 
     def _resolve_log_uri(self, ti) -> Optional[str]:
-        log_uri = ti.xcom_pull(key=EMR_LOG_URI_XCOM_KEY)
+        log_uri = ti.xcom_pull(key=EMR_LOG_URI_XCOM_KEY, task_ids=ti.task_id)
         if log_uri:
             return normalize_log_uri(log_uri)
         from airflow.providers.amazon.aws.links.emr import EmrLogsLink
 
-        conf = ti.xcom_pull(key=EmrLogsLink.key)
+        conf = ti.xcom_pull(key=EmrLogsLink.key, task_ids=ti.task_id)
         if isinstance(conf, dict) and conf.get("log_uri"):
             return normalize_log_uri(conf["log_uri"])
         return None
