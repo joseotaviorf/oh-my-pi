@@ -1,90 +1,92 @@
----
 database_name: datalake_salesforce_clean
 table_name: events_purchase_sale_contract
 description: >
   Clean CDC table for Purchase Sale Contract (Contrato de Compra e Venda / CCV) change events
-  from Salesforce object PurchaseSaleContract__c. One row per committed change on a for-sale
-  transaction contract. Grain is id_record + transaction_key + sequence_number. Join to the
-  snapshot via id_record = datalake_salesforce_clean.purchase_sale_contract.id, to the offer
-  via offer_id__c = dw_sale.dim_sale_agreement.sk_offer, and to buyer/seller Accounts via
-  buyer__c / seller__c. CREATE events populate the full business payload; UPDATE events are
-  sparse (only changed fields). Reconstruct current state by aggregating on id_record ordered
-  by id_replay. Used by For Sale Transact (EoP) analytics for CCV, CRN, CRI, diligence, and
-  onboarding milestone tracking.
+  from Salesforce object PurchaseSaleContract__c.
+  One row per committed change on a for-sale transaction contract.
+  Grain is id_record + transaction_key + sequence_number.
+  Join to the snapshot via id_record = datalake_salesforce_clean.purchase_sale_contract.id, to
+  the offer via offer_id__c = dw_sale.dim_sale_agreement.sk_offer, and to buyer/seller
+  Accounts via buyer__c / seller__c.
+  CREATE events populate the full business payload; UPDATE events are sparse (only changed
+  fields).
+  Reconstruct current state by aggregating on id_record ordered by id_replay.
+  Used by For Sale Transact (EoP) analytics for CCV, CRN, CRI, diligence, and onboarding
+  milestone tracking.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com
 columns:
   id_record:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.id_record
+    - datalake_salesforce_raw.events_purchase_sale_contract.id_record
     description: Primary Salesforce 18-digit identifier of the PurchaseSaleContract__c record (prefix a0H). Groups CDC updates for the same CCV and joins to datalake_salesforce_clean.purchase_sale_contract.id.
   commit_number:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.commit_number
+    - datalake_salesforce_raw.events_purchase_sale_contract.commit_number
     description: Salesforce CDC commit number for the transaction that produced this event.
   commit_ts:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.commit_ts
+    - datalake_salesforce_raw.events_purchase_sale_contract.commit_ts
     description: Commit timestamp of the CDC event in epoch milliseconds. Divide by 1000 to get seconds; committed_at is TIMESTAMP_MILLIS of this value.
   sequence_number:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.sequence_number
+    - datalake_salesforce_raw.events_purchase_sale_contract.sequence_number
     description: Sequence of this CDC event inside the Salesforce transaction (starts at 1).
   entity_name:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.entity_name
+    - datalake_salesforce_raw.events_purchase_sale_contract.entity_name
     description: Salesforce entity that originated the event. Always PurchaseSaleContract__c for this table.
   event_type:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.event_type
+    - datalake_salesforce_raw.events_purchase_sale_contract.event_type
     description: Type of CDC event. Observed values are CREATE (full business payload) and UPDATE (only changed fields populated).
   transaction_key:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.transaction_key
+    - datalake_salesforce_raw.events_purchase_sale_contract.transaction_key
     description: Unique key identifying the Salesforce transaction that generated the event.
   commit_user:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.commit_user
-    description: Salesforce user ID who committed the change. Joinable with datalake_salesforce_clean.users.
+    - datalake_salesforce_raw.events_purchase_sale_contract.commit_user
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   action_taken__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ActionTaken__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.ActionTaken__c
     description: Boolean flag indicating whether an operational action was already taken on this CCV record in Salesforce.
   addendum_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.AddendumStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.AddendumStatus__c
     description: Status of an addendum (aditivo) on the CCV (Status do Aditivo).
     categories:
-      "Sem Aditivo": No addendum exists on the contract.
+      Sem Aditivo: No addendum exists on the contract.
       Solicitado: An addendum was requested and is in progress.
-      "Concluído": The addendum workflow finished.
+      Concluído: The addendum workflow finished.
       Cancelado: The addendum was canceled.
   address__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Address__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.Address__c
     description: Free-text property address associated with the CCV (street, unit, neighborhood, and city).
   buyer__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Buyer__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.Buyer__c
     description: Salesforce Account ID of the buyer (Comprador) on the CCV. Prefix 001; joinable with datalake_salesforce_clean.account.
   buyer_onboarding_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.BuyerOnboardingStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.BuyerOnboardingStatus__c
     description: Post-CCV onboarding status for the buyer (handover from the EN to the SPOC).
     categories:
       PENDING: Buyer onboarding has not finished.
       COMPLETED: Buyer onboarding is complete.
   by_pays_entire_deposit__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.BYPaysEntireDeposit__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.BYPaysEntireDeposit__c
     description: Boolean flag indicating whether the buyer (BY) pays the entire earnest deposit (sinal) instead of splitting it.
   ccv_signed_at__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CCVSignedAt__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CCVSignedAt__c
     description: Timestamp when the CCV (Compromisso de Compra e Venda) was signed, in epoch milliseconds on CDC payloads.
   ccv_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CCVStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CCVStatus__c
     description: Lifecycle status of the CCV documentation workflow (Status do CCV). CREATE events typically start as IN_PROGRESS.
     categories:
       IN_PROGRESS: CCV workflow is ongoing.
@@ -92,23 +94,23 @@ columns:
       CANCELED: CCV was canceled.
   crn_complexity__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CRN_Complexity__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRN_Complexity__c
     description: Qualitative complexity of the notary (CRN) workflow for this CCV, stored as a numeric picklist string.
     categories:
-      "1": Lowest CRN complexity.
-      "2": Medium CRN complexity.
-      "3": Highest CRN complexity.
+      '1': Lowest CRN complexity.
+      '2': Medium CRN complexity.
+      '3': Highest CRN complexity.
   crn_name__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CRNName__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRNName__c
     description: Display name of the notary office (Cartório de Notas / CRN) handling the deed, e.g. 19ºCRN/SP - Toledo.
   crn_partner__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CRNPartner__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRNPartner__c
     description: Salesforce Account ID of the partner notary (CRN parceiro) assigned to the CCV. Prefix 001; joinable with datalake_salesforce_clean.account.
   crn_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CRNStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRNStatus__c
     description: Picklist tracking the notary (CRN) workflow stage for the CCV (Status do CRN), from draft through deed signature.
     categories:
       NOT_STARTED: CRN work has not started (typical value on CREATE).
@@ -121,23 +123,23 @@ columns:
       CANCELED: CRN workflow was canceled.
   id_created_by:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CreatedById
-    description: Salesforce user ID who created the CCV record. Joinable with datalake_salesforce_clean.users.
+    - datalake_salesforce_raw.events_purchase_sale_contract.CreatedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   created_date:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.CreatedDate
+    - datalake_salesforce_raw.events_purchase_sale_contract.CreatedDate
     description: Timestamp when the PurchaseSaleContract__c record was first created in Salesforce, in epoch milliseconds on CDC payloads.
   deal_maker_email__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.DealMakerEmail__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.DealMakerEmail__c
     description: Email of the deal-maker broker (corretor) accountable for the sale, typically on corretores.quintoandar.com.br.
   deal_maker_name__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.DealMakerName__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.DealMakerName__c
     description: Display name of the deal-maker broker (corretor) accountable for the sale.
   diligence_classification__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.DiligenceClassification__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.DiligenceClassification__c
     description: Risk classification from due diligence (diligência) on the property and parties.
     categories:
       NOT_STARTED: Diligence classification has not started (typical value on CREATE).
@@ -146,7 +148,7 @@ columns:
       MODERATE_RISK: Diligence classified the case as moderate risk.
   diligence_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.DiligenceStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.DiligenceStatus__c
     description: Operational status of the due-diligence (diligência) review on the CCV.
     categories:
       PROCESSING: Diligence is in progress (typical value on CREATE).
@@ -157,19 +159,19 @@ columns:
       REPORT_SENT_SELLER: Report was sent to the seller.
   down_payment_deadline__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.DownPaymentDeadline__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.DownPaymentDeadline__c
     description: Deadline for the earnest deposit (sinal / down payment), in epoch milliseconds on CDC payloads.
   external_id__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ExternalId__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.ExternalId__c
     description: Numeric sales-flow identifier of the CCV (External ID). Appears in sales_flow_url__c as /salesflow/{external_id}.
   fs_cri_name_ccv__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.FS_CRINameCCV__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_CRINameCCV__c
     description: Name of the real-estate registry office (Cartório de Registro de Imóveis / CRI) handling CCV registration, e.g. 1º CRI.
   fs_cri_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.FS_CRIStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_CRIStatus__c
     description: For Sale status of the CRI registration workflow on the CCV (Status do CRI).
     categories:
       NOT_STARTED: CRI registration has not started (typical value on CREATE).
@@ -181,38 +183,38 @@ columns:
       CANCELED: CRI workflow was canceled.
   fs_endorsement_status_ccv__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.FS_EndorsementStatusCCV__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_EndorsementStatusCCV__c
     description: For Sale status of the endorsement / averbação milestone on the CCV (Status da Averbação).
     categories:
-      "Não Iniciada": Endorsement has not started (typical value on CREATE).
+      Não Iniciada: Endorsement has not started (typical value on CREATE).
       Solicitada: Endorsement was requested.
-      "Aguardando Vendedor Solicitar Averbação": Waiting for the seller to request endorsement.
+      Aguardando Vendedor Solicitar Averbação: Waiting for the seller to request endorsement.
       Finalizada: Endorsement finished.
   fs_id_cartorio_ccv__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.FS_IDCartorioCCV__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_IDCartorioCCV__c
     description: Registry office identifier associated with the CCV (ID Cartório). Usually null on CREATE and populated later on UPDATE.
   fs_payment_proof_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.FS_PaymentProofStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_PaymentProofStatus__c
     description: Status of payment-proof collection for the CCV (Status do comprovante de pagamento). Observed CREATE value is WAITING_INFORMATION.
   has_down_payment_extension__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.HasDownPaymentExtension__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.HasDownPaymentExtension__c
     description: Picklist indicating whether the earnest-deposit (sinal) deadline was extended (Possui prorrogação de sinal).
     categories:
-      "Não": No down-payment extension.
+      Não: No down-payment extension.
       Sim: Down-payment deadline was extended.
   house_chattel_mortgage__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.HouseChattelMortgage__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.HouseChattelMortgage__c
     description: Whether the property has a chattel mortgage / fiduciary lien (alienação fiduciária) on record.
     categories:
       DOES_NOT: Property has no chattel mortgage.
       YES_DEBT: Property has an outstanding chattel-mortgage debt.
   house_occupant__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.HouseOccupant__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.HouseOccupant__c
     description: Who occupies the property at CCV time (ocupante do imóvel).
     categories:
       QUINTOANDAR_TENANT: Occupied by a QuintoAndar tenant.
@@ -220,46 +222,46 @@ columns:
       VACANT: Property is vacant.
   house_registry_must_be_updated__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.HouseRegistryMustBeUpdated__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.HouseRegistryMustBeUpdated__c
     description: Boolean flag indicating whether the house registry (matrícula) must be updated before closing.
   house_state__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.HouseState__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.HouseState__c
     description: Brazilian state (UF) where the contracted property is located, e.g. SP or MG.
   inspection_data_completed__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Inspection_Data_Completed__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.Inspection_Data_Completed__c
     description: Boolean flag indicating whether inspection (vistoria) data collection for the CCV is complete.
   intervening_party_receipt_completed__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Intervening_Party_Receipt_Completed__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.Intervening_Party_Receipt_Completed__c
     description: Boolean flag indicating whether the intervening-party receipt (Termo de Interveniente Quitante / IQ) step is complete.
   is_assigned__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.IsAssigned__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsAssigned__c
     description: Boolean flag indicating whether the CCV is assigned to an operations owner in Salesforce.
   is_buyer_eligible_for_chatbot__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.IsBuyerEligibleForChatbot__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsBuyerEligibleForChatbot__c
     description: Boolean flag indicating whether the buyer is eligible for the Vandinha / EoP chatbot.
   is_diligence_accepted__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.IsDiligenceAccepted__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsDiligenceAccepted__c
     description: Picklist for buyer/seller acceptance of the due-diligence report (DD), not a true boolean.
     categories:
       DD_PENDING: Diligence acceptance is still pending (typical value on CREATE).
       DD_ACCEPTED: Diligence report was accepted.
   is_seller_eligible_for_chatbot__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.IsSellerEligibleForChatbot__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsSellerEligibleForChatbot__c
     description: Boolean flag indicating whether the seller is eligible for the Vandinha / EoP chatbot.
   is_suspended__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.IsSuspended__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsSuspended__c
     description: Boolean flag indicating whether the CCV workflow is suspended in Salesforce.
   itbi_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ITBIStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.ITBIStatus__c
     description: Status of the municipal property-transfer tax (ITBI) process for the CCV.
     categories:
       WAITING_INFORMATION: Waiting for ITBI data (typical value on CREATE).
@@ -267,126 +269,362 @@ columns:
       ITBI_PAID: ITBI was paid.
   id_last_modified_by:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedById
-    description: Salesforce user ID who last modified the CCV record. Joinable with datalake_salesforce_clean.users.
+    - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   last_modified_date:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedDate
+    - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedDate
     description: Standard Salesforce last-modified timestamp of the CCV record, in epoch milliseconds on CDC payloads.
   last_modified_date__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedDate__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.LastModifiedDate__c
     description: Custom business last-modified date of the CCV (Data da última modificação), in epoch milliseconds. Usually absent on CREATE and set on later UPDATE events.
   long_term_payment__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LongTermPayment__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.LongTermPayment__c
     description: Whether the remaining balance is a long-term payment (pagamento a longo prazo) versus a standard schedule.
     categories:
-      "Não Longo Prazo": Payment is not long-term (typical value on CREATE).
-      "Longo Prazo": Remaining payment is long-term.
+      Não Longo Prazo: Payment is not long-term (typical value on CREATE).
+      Longo Prazo: Remaining payment is long-term.
   lt_aux_crn_status_draft_approved__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusDraftApproved__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusDraftApproved__c
     description: Auxiliary lead-time marker for the CRN draft-approved stage, stored as a date-range string (entered>exited, e.g. 21/09/2026>**/**/****). Populated on UPDATE, not on CREATE.
   lt_aux_crn_status_signature_scheduled__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusSignatureScheduled__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusSignatureScheduled__c
     description: Auxiliary lead-time marker for the CRN signature-scheduled stage, stored as a date-range string (entered>exited). Populated on UPDATE, not on CREATE.
   name:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Name
+    - datalake_salesforce_raw.events_purchase_sale_contract.Name
     description: Salesforce record name of the CCV. On CREATE it matches offer_id__c (the sales-flow offer identifier).
   offer_id__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.OfferId__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.OfferId__c
     description: Sales-flow offer identifier linked to the CCV. Joinable with dw_sale.dim_sale_agreement.sk_offer.
   id_owner:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.OwnerId
-    description: Salesforce owner of the CCV record (user or queue). Joinable with datalake_salesforce_clean.users when it is a user ID.
+    - datalake_salesforce_raw.events_purchase_sale_contract.OwnerId
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   payment_method__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.PaymentMethod__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.PaymentMethod__c
     description: Payment method selected for closing the CCV. Observed CREATE value is CASH (à vista); other tracks such as financing may appear on later events.
   id_record_type:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.RecordTypeId
-    description: Salesforce record-type ID of the PurchaseSaleContract__c row (prefix 012). Distinguishes CCV record types in Salesforce.
+    - datalake_salesforce_raw.events_purchase_sale_contract.RecordTypeId
+    description: Salesforce RecordType Id defining the Case (or object) layout and business process. Join to dw_support_journey.dim_record_type.sk_record_type for name, developer_name and sObject metadata.
   sales_flow_url__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SalesFlowUrl__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SalesFlowUrl__c
     description: Deep-link URL to the guided sales flow for this CCV, typically http://vendas.quintoandar.com.br/salesflow/{external_id}.
   seller__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.Seller__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.Seller__c
     description: Salesforce Account ID of the seller (Vendedor) on the CCV. Prefix 001; joinable with datalake_salesforce_clean.account.
   seller_onboarding_status__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SellerOnboardingStatus__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SellerOnboardingStatus__c
     description: Post-CCV onboarding status for the seller (handover from the EN to the SPOC).
     categories:
       PENDING: Seller onboarding has not finished.
       COMPLETED: Seller onboarding is complete.
   share_community_portal__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ShareCommunityPortal__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.ShareCommunityPortal__c
     description: Boolean flag indicating whether the CCV is shared on the Salesforce community portal used by CRN partners.
   signal_brokerage__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SignalBrokerage__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SignalBrokerage__c
     description: Picklist indicating whether brokerage commission applies to the earnest deposit / sinal (Sinal corretagem).
     categories:
       Sim: Brokerage applies to the deposit.
-      "Não": Brokerage does not apply to the deposit.
+      Não: Brokerage does not apply to the deposit.
   simplified_stage__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SimplifiedStage__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SimplifiedStage__c
     description: Simplified commercial stage of the CCV for reporting. Observed CREATE value is Onboarding (first post-CCV touchpoint).
   subscription_model_buyer__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionModelBuyer__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionModelBuyer__c
     description: Signature model selected for the buyer (Modelo de Assinatura Comprador). Usually absent on CREATE and set later on UPDATE.
     categories:
       Digital: Buyer signs digitally.
       Presencial: Buyer signs in person.
   subscription_model_seller__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionModelSeller__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionModelSeller__c
     description: Signature model selected for the seller (Modelo de Assinatura Vendedor). Usually absent on CREATE and set later on UPDATE.
     categories:
       Digital: Seller signs digitally.
       Presencial: Seller signs in person.
   subscription_scheduling_date__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionSchedulingDate__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.SubscriptionSchedulingDate__c
     description: Scheduled date for CCV signature (Data de Agendamento da Assinatura), in epoch milliseconds on CDC payloads. Usually absent on CREATE.
   thread_id__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ThreadId__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.ThreadId__c
     description: Collaboration thread identifier linked to the CCV case (format thread::{id}::), used to group operational conversation.
   vandinha_buyer_escalated__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaBuyerEscalated__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaBuyerEscalated__c
     description: Boolean flag indicating whether the Vandinha (EoP chatbot) conversation with the buyer was escalated to a human.
   vandinha_seller_escalated__c:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaSellerEscalated__c
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaSellerEscalated__c
     description: Boolean flag indicating whether the Vandinha (EoP chatbot) conversation with the seller was escalated to a human.
   id_replay:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ReplayId
+    - datalake_salesforce_raw.events_purchase_sale_contract.ReplayId
     description: Salesforce CDC replay ID used to order and replay events for the same id_record.
   committed_at:
     description: Timestamp of when the CDC event was committed, derived from commit_ts (format YYYY-MM-DD HH:MM:SS, UTC). Equivalent to TIMESTAMP_MILLIS(commit_ts).
   ts_load:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.ts_load
+    - datalake_salesforce_raw.events_purchase_sale_contract.ts_load
     description: Timestamp of when the record was loaded into the raw table by the SST pipeline.
   partition_date:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.partition_date
+    - datalake_salesforce_raw.events_purchase_sale_contract.partition_date
     description: Partition date used for table partitioning (YYYY-MM-DD), aligned to the Airflow data interval.
   partition_hour:
     lineage:
-      - datalake_salesforce_raw.events_purchase_sale_contract.partition_hour
+    - datalake_salesforce_raw.events_purchase_sale_contract.partition_hour
     description: Partition hour used for table partitioning (HH), aligned to the Airflow data interval.
+  changed_field:
+    description: Array of Salesforce API field names from ChangeEventHeader.changedFields on UPDATE events; NULL or empty on CREATE. Element values keep original Salesforce API names.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.changed_field
+  ave_have_demand_note__c:
+    description: Normalized clean column for Salesforce field ave_have_demand_note__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.AVE_HaveDemandNote__c
+  alienation_status__c:
+    description: Normalized clean column for Salesforce field alienation_status__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.AlienationStatus__c
+  bookkeeping_done_date_ccv__c:
+    description: Normalized clean column for Salesforce field bookkeeping_done_date_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.BookkeepingDoneDateCCV__c
+  cri_have_demand_note__c:
+    description: Normalized clean column for Salesforce field cri_have_demand_note__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRI_HaveDemandNote__c
+  concomitant_registration__c:
+    description: Normalized clean column for Salesforce field concomitant_registration__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.ConcomitantRegistration__c
+  continue_with_partner_registry__c:
+    description: Normalized clean column for Salesforce field continue_with_partner_registry__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.ContinueWithPartnerRegistry__c
+  dd_accepted_date__c:
+    description: Normalized clean column for Salesforce field dd_accepted_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.DDAcceptedDate__c
+  escrivao__c:
+    description: Normalized clean column for Salesforce field escrivao__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.Escrivao__c
+  fs_by_key_delivery_date__c:
+    description: Normalized clean column for Salesforce field fs_by_key_delivery_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_BY_KeyDeliveryDate__c
+  fs_balance_payment_made__c:
+    description: Normalized clean column for Salesforce field fs_balance_payment_made__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_BalancePaymentMade__c
+  key_delivery_date__c:
+    description: Normalized clean column for Salesforce field key_delivery_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.KeyDeliveryDate__c
+  keys_received__c:
+    description: Normalized clean column for Salesforce field keys_received__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.KeysReceived__c
+  lt_aux_crn_status_deed_signed__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_deed_signed__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusDeedSigned__c
+  lt_aux_crn_status_draft_in_preparation__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_draft_in_preparation__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusDraftInPreparation__c
+  lt_aux_crn_status_draft_sent_under_approval__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_draft_sent_under_approval__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusDraftSentUnderApproval__c
+  lt_aux_fscri_status_pre_cri__c:
+    description: Normalized clean column for Salesforce field lt_aux_fscri_status_pre_cri__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSCRIStatusPreCri__c
+  paid_via_ted__c:
+    description: Normalized clean column for Salesforce field paid_via_ted__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.PaidViaTed__c
+  stage__c:
+    description: Normalized clean column for Salesforce field stage__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.Stage__c
+  fs_reasons_lt_overrun_ccv__c:
+    description: Normalized clean column for Salesforce field fs_reasons_lt_overrun_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_ReasonsLTOverrunCCV__c
+  lt_aux_fscri_status_ticket_paid__c:
+    description: Normalized clean column for Salesforce field lt_aux_fscri_status_ticket_paid__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSCRIStatusTicketPaid__c
+  rescission_status__c:
+    description: Normalized clean column for Salesforce field rescission_status__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.RescissionStatus__c
+  agent_email__c:
+    description: Normalized clean column for Salesforce field agent_email__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.AgentEmail__c
+  cri_done_date_ccv__c:
+    description: Normalized clean column for Salesforce field cri_done_date_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRIDoneDateCCV__c
+  lt_aux_cri_status_registration_received_buyer__c:
+    description: Normalized clean column for Salesforce field lt_aux_cri_status_registration_received_buyer__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRIStatusRegistrationReceivedBuyer__c
+  ccv_termination_created_at__c:
+    description: Normalized clean column for Salesforce field ccv_termination_created_at__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.CCVTerminationCreatedAt__c
+  fs_sl_key_delivery_date__c:
+    description: Normalized clean column for Salesforce field fs_sl_key_delivery_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_SL_KeyDeliveryDate__c
+  fs_reason_non_conversion_ccv__c:
+    description: Normalized clean column for Salesforce field fs_reason_non_conversion_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_ReasonNonConversionCCV__c
+  is_down_payment_paid__c:
+    description: Normalized clean column for Salesforce field is_down_payment_paid__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.IsDownPaymentPaid__c
+  lt_aux_fscri_status_prenoted__c:
+    description: Normalized clean column for Salesforce field lt_aux_fscri_status_prenoted__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSCRIStatusPrenoted__c
+  fs_cri_request_date_ccv__c:
+    description: Normalized clean column for Salesforce field fs_cri_request_date_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_CRI_RequestDateCCV__c
+  lt_aux_alienation_status_payment_made__c:
+    description: Normalized clean column for Salesforce field lt_aux_alienation_status_payment_made__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxAlienationStatusPaymentMade__c
+  proof_payment_received__c:
+    description: Normalized clean column for Salesforce field proof_payment_received__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.ProofPaymentReceived__c
+  lt_aux_fs_endorsement_status_ccv_finalizada__c:
+    description: Normalized clean column for Salesforce field lt_aux_fs_endorsement_status_ccv_finalizada__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSEndorsementStatusCCVFinalizada__c
+  lt_aux_fs_endorsement_status_ccv_solicitada__c:
+    description: Normalized clean column for Salesforce field lt_aux_fs_endorsement_status_ccv_solicitada__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSEndorsementStatusCCVSolicitada__c
+  lt_aux_fscri_status_ticket_issued__c:
+    description: Normalized clean column for Salesforce field lt_aux_fscri_status_ticket_issued__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSCRIStatusTicketIssued__c
+  fs_reasons_lt_overrun_register_ccv__c:
+    description: Normalized clean column for Salesforce field fs_reasons_lt_overrun_register_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_ReasonsLTOverrunRegisterCCV__c
+  cri_password__c:
+    description: Normalized clean column for Salesforce field cri_password__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRI_Password__c
+  ticket_due_date__c:
+    description: Normalized clean column for Salesforce field ticket_due_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.TicketDueDate__c
+  cri_protocol__c:
+    description: Normalized clean column for Salesforce field cri_protocol__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.CRI_Protocol__c
+  lt_aux_end_status_ccv_aguardando_vend_solic_aver__c:
+    description: Normalized clean column for Salesforce field lt_aux_end_status_ccv_aguardando_vend_solic_aver__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxEndStatusCCVAguardandoVendSolicAver__c
+  requested_by__c:
+    description: Normalized clean column for Salesforce field requested_by__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.RequestedBy__c
+  vandinha_seller_escalated_at__c:
+    description: Normalized clean column for Salesforce field vandinha_seller_escalated_at__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaSellerEscalatedAt__c
+  vandinha_seller_escalated_at_stage__c:
+    description: Normalized clean column for Salesforce field vandinha_seller_escalated_at_stage__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaSellerEscalatedAtStage__c
+  request_type__c:
+    description: Normalized clean column for Salesforce field request_type__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.RequestType__c
+  fs_amortization_method__c:
+    description: Normalized clean column for Salesforce field fs_amortization_method__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_AmortizationMethod__c
+  fs_ave_password_ccv__c:
+    description: Normalized clean column for Salesforce field fs_ave_password_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_AVE_PasswordCCV__c
+  lt_aux_fscri_status_finished__c:
+    description: Normalized clean column for Salesforce field lt_aux_fscri_status_finished__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxFSCRIStatusFinished__c
+  fs_endorsement_request_date_ccv__c:
+    description: Normalized clean column for Salesforce field fs_endorsement_request_date_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_Endorsement_RequestDateCCV__c
+  fs_ave_protocol_ccv__c:
+    description: Normalized clean column for Salesforce field fs_ave_protocol_ccv__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.FS_AVE_ProtocolCCV__c
+  lt_aux_crn_status_not_started__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_not_started__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusNotStarted__c
+  have_demand_note_reason__c:
+    description: Normalized clean column for Salesforce field have_demand_note_reason__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.HaveDemandNoteReason__c
+  lt_aux_ali_status_rec_settlement_received_crn__c:
+    description: Normalized clean column for Salesforce field lt_aux_ali_status_rec_settlement_received_crn__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxAliStatusRecSettlementReceivedCrn__c
+  lt_aux_crn_status_canceled__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_canceled__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusCanceled__c
+  lease_complaint_sent__c:
+    description: Normalized clean column for Salesforce field lease_complaint_sent__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LeaseComplaintSent__c
+  lt_aux_crn_status_awaiting_dd_acceptance__c:
+    description: Normalized clean column for Salesforce field lt_aux_crn_status_awaiting_dd_acceptance__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxCRNStatusAwaitingDDAcceptance__c
+  lt_aux_alienation_status_invoice_sent_to_buyer__c:
+    description: Normalized clean column for Salesforce field lt_aux_alienation_status_invoice_sent_to_buyer__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.LTAuxAlienationStatusInvoiceSentToBuyer__c
+  vandinha_buyer_escalated_at_stage__c:
+    description: Normalized clean column for Salesforce field vandinha_buyer_escalated_at_stage__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaBuyerEscalatedAtStage__c
+  vandinha_buyer_escalated_at__c:
+    description: Normalized clean column for Salesforce field vandinha_buyer_escalated_at__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_purchase_sale_contract.VandinhaBuyerEscalatedAt__c

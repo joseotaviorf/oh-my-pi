@@ -1,116 +1,147 @@
----
 database_name: datalake_salesforce_clean
 table_name: events_case_end_of_process
 description: >
-  Clean table for Case End Of Process (Caso de End Of Process) CDC events from Salesforce. 
-  Each row is one change on a CaseEndOfProcess__c record used to track end-of-process checklist steps. 
-  CDC UPDATE rows are sparse; aggregate by id_record ordered by id_replay to reconstruct state.
+  Auxiliary CDC table for Salesforce CaseEndOfProcess__c, extending a parent Case with
+  process-specific attributes.
+  Join to datalake_salesforce_clean.events_case.id_record on
+  datalake_salesforce_clean.events_case.case_end_of_process__c = this table's id_record
+  (Salesforce Id of the auxiliary record).
+  CDC UPDATE events are sparse; aggregate by id_record ordered by id_replay to reconstruct
+  state.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com
 columns:
   id_record:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.id_record
-    description: Primary Salesforce 18-digit identifier for the record; groups CDC updates for the same object.
+    - datalake_salesforce_raw.events_case_end_of_process.id_record
+    description: Salesforce 18-digit Id of the CaseEndOfProcess__c auxiliary record; CDC grain key. Join from events_case.case_end_of_process__c when that lookup is populated.
   commit_number:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.commit_number
+    - datalake_salesforce_raw.events_case_end_of_process.commit_number
     description: Commit number associated with the CDC event.
   commit_ts:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.commit_ts
+    - datalake_salesforce_raw.events_case_end_of_process.commit_ts
     description: Commit timestamp of the CDC event in milliseconds epoch. Divide by 1000 to get seconds.
   sequence_number:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.sequence_number
+    - datalake_salesforce_raw.events_case_end_of_process.sequence_number
     description: Sequence number of the CDC event within the transaction.
   entity_name:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.entity_name
+    - datalake_salesforce_raw.events_case_end_of_process.entity_name
     description: Salesforce entity name that originated the event (CaseEndOfProcess__c).
   event_type:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.event_type
+    - datalake_salesforce_raw.events_case_end_of_process.event_type
     description: Type of CDC event. Observed values are CREATE and UPDATE; UPDATE events are sparse (only changed fields populated).
   transaction_key:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.transaction_key
+    - datalake_salesforce_raw.events_case_end_of_process.transaction_key
     description: Unique key identifying the transaction that generated the event.
   commit_user:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.commit_user
-    description: Salesforce user ID who committed the change.
+    - datalake_salesforce_raw.events_case_end_of_process.commit_user
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   change_ownership__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Change_Ownership__c
-    description: Flag for change-of-ownership step in the end-of-process checklist.
+    - datalake_salesforce_raw.events_case_end_of_process.Change_Ownership__c
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   complete_checklist__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Complete_Checklist__c
+    - datalake_salesforce_raw.events_case_end_of_process.Complete_Checklist__c
     description: Flag indicating the end-of-process checklist is complete.
   confirmation_amounts__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Confirmation_Amounts__c
+    - datalake_salesforce_raw.events_case_end_of_process.Confirmation_Amounts__c
     description: Flag for confirmation of amounts step in the end-of-process checklist.
   id_created_by:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.CreatedById
-    description: Salesforce user ID who created the record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_case_end_of_process.CreatedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   created_date:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.CreatedDate
+    - datalake_salesforce_raw.events_case_end_of_process.CreatedDate
     description: Date when the record was created in Salesforce.
   credit_refund__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Credit_Refund__c
+    - datalake_salesforce_raw.events_case_end_of_process.Credit_Refund__c
     description: Flag for credit refund step in the end-of-process checklist.
   id_last_modified_by:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.LastModifiedById
-    description: Salesforce user ID who last modified the record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_case_end_of_process.LastModifiedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   last_modified_date:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.LastModifiedDate
+    - datalake_salesforce_raw.events_case_end_of_process.LastModifiedDate
     description: Date when the record was last modified in Salesforce.
   management_analysis__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Management_Analysis__c
+    - datalake_salesforce_raw.events_case_end_of_process.Management_Analysis__c
     description: Flag for management analysis step in the end-of-process checklist.
   name:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Name
+    - datalake_salesforce_raw.events_case_end_of_process.Name
     description: Name of the Case End Of Process record.
   id_owner:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.OwnerId
-    description: Salesforce owner user ID of the record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_case_end_of_process.OwnerId
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   paid_intervener__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Paid_intervener__c
+    - datalake_salesforce_raw.events_case_end_of_process.Paid_intervener__c
     description: Flag for paid intervener step in the end-of-process checklist.
   id_record_type:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.RecordTypeId
-    description: Salesforce record type ID (ID do tipo de registro) defining the Case End Of Process layout and business process variant.
+    - datalake_salesforce_raw.events_case_end_of_process.RecordTypeId
+    description: Salesforce RecordType Id defining the Case (or object) layout and business process. Join to dw_support_journey.dim_record_type.sk_record_type for name, developer_name and sObject metadata.
   submitted_credit__c:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.Submitted_credit__c
+    - datalake_salesforce_raw.events_case_end_of_process.Submitted_credit__c
     description: Flag for submitted credit step in the end-of-process checklist.
   id_replay:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.ReplayId
+    - datalake_salesforce_raw.events_case_end_of_process.ReplayId
     description: Replay ID used for CDC event replay from Salesforce.
   committed_at:
     description: Timestamp of when the CDC event was committed, derived from commit_ts (format YYYY-MM-DD HH:MM:SS, UTC). Equivalent to TIMESTAMP_MILLIS(commit_ts).
   ts_load:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.ts_load
+    - datalake_salesforce_raw.events_case_end_of_process.ts_load
     description: Timestamp of when the record was loaded into the raw table.
   partition_date:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.partition_date
+    - datalake_salesforce_raw.events_case_end_of_process.partition_date
     description: Partition date used for table partitioning (YYYY-MM-DD).
   partition_hour:
     lineage:
-      - datalake_salesforce_raw.events_case_end_of_process.partition_hour
+    - datalake_salesforce_raw.events_case_end_of_process.partition_hour
     description: Partition hour used for table partitioning (HH).
+  changed_field:
+    description: Array of Salesforce API field names from ChangeEventHeader.changedFields on UPDATE events; NULL or empty on CREATE. Element values keep original Salesforce API names.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.changed_field
+  credit_refund_date__c:
+    description: Normalized clean column for Salesforce field credit_refund_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Credit_Refund_Date__c
+  management_analysis_date__c:
+    description: Normalized clean column for Salesforce field management_analysis_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Management_Analysis_Date__c
+  submitted_credit_date__c:
+    description: Normalized clean column for Salesforce field submitted_credit_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Submitted_credit_Date__c
+  confirmation_amounts_date__c:
+    description: Normalized clean column for Salesforce field confirmation_amounts_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Confirmation_Amounts_Date__c
+  paid_intervener_date__c:
+    description: Normalized clean column for Salesforce field paid_intervener_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Paid_intervener_Date__c
+  complete_checklist_date__c:
+    description: Normalized clean column for Salesforce field complete_checklist_date__c. Text or date-time string from Salesforce CDC. NULL when the field was not included in a sparse UPDATE event.
+    lineage:
+    - datalake_salesforce_raw.events_case_end_of_process.Complete_Checklist_Date__c

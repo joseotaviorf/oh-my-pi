@@ -1,84 +1,88 @@
----
 database_name: datalake_salesforce_clean
 table_name: events_follow_up
 description: >
   Clean table for Follow Up (Follow_Up__c) CDC events from Salesforce for-sale operations.
   Each row is one change on a follow-up record (name prefix FUP).
-  CDC UPDATE rows are sparse; aggregate by id_record ordered by id_replay to reconstruct state.
+  CDC UPDATE rows are sparse; aggregate by id_record ordered by id_replay to reconstruct
+  state.
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com
 columns:
   id_record:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.id_record
+    - datalake_salesforce_raw.events_follow_up.id_record
     description: Primary Salesforce 18-digit identifier for the record; groups CDC updates for the same object.
   commit_number:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.commit_number
+    - datalake_salesforce_raw.events_follow_up.commit_number
     description: Commit number associated with the CDC event.
   commit_ts:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.commit_ts
+    - datalake_salesforce_raw.events_follow_up.commit_ts
     description: Commit timestamp of the CDC event in milliseconds epoch. Divide by 1000 to get seconds.
   sequence_number:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.sequence_number
+    - datalake_salesforce_raw.events_follow_up.sequence_number
     description: Sequence number of the CDC event within the transaction.
   entity_name:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.entity_name
+    - datalake_salesforce_raw.events_follow_up.entity_name
     description: Salesforce entity name that originated the event (Follow_Up__c).
   event_type:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.event_type
+    - datalake_salesforce_raw.events_follow_up.event_type
     description: Type of CDC event. Observed values are CREATE and UPDATE; UPDATE events are sparse (only changed fields populated).
   transaction_key:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.transaction_key
+    - datalake_salesforce_raw.events_follow_up.transaction_key
     description: Unique key identifying the transaction that generated the event.
   commit_user:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.commit_user
-    description: Salesforce user ID who committed the change.
+    - datalake_salesforce_raw.events_follow_up.commit_user
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   id_created_by:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.CreatedById
-    description: Salesforce user ID who created the follow-up record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_follow_up.CreatedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   created_date:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.CreatedDate
+    - datalake_salesforce_raw.events_follow_up.CreatedDate
     description: Timestamp when the follow-up (Follow Up) record was first created in Salesforce (Data de criação), in epoch milliseconds on CDC payloads.
   id_last_modified_by:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.LastModifiedById
-    description: Salesforce user ID who last modified the follow-up record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_follow_up.LastModifiedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   last_modified_date:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.LastModifiedDate
+    - datalake_salesforce_raw.events_follow_up.LastModifiedDate
     description: Timestamp of the latest modification to the follow-up record in Salesforce (Data da última modificação), in epoch milliseconds on CDC payloads.
   name:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.Name
+    - datalake_salesforce_raw.events_follow_up.Name
     description: Follow-up display name in Salesforce (e.g. FUP - 552144).
   id_owner:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.OwnerId
-    description: Salesforce owner user ID of the follow-up record. Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_follow_up.OwnerId
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   id_replay:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.ReplayId
+    - datalake_salesforce_raw.events_follow_up.ReplayId
     description: Replay ID used for CDC event replay from Salesforce.
   committed_at:
     description: Timestamp of when the CDC event was committed, derived from commit_ts (format YYYY-MM-DD HH:MM:SS, UTC). Equivalent to TIMESTAMP_MILLIS(commit_ts).
   ts_load:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.ts_load
+    - datalake_salesforce_raw.events_follow_up.ts_load
     description: Timestamp of when the record was loaded into the raw table.
   partition_date:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.partition_date
+    - datalake_salesforce_raw.events_follow_up.partition_date
     description: Partition date used for table partitioning (YYYY-MM-DD).
   partition_hour:
     lineage:
-      - datalake_salesforce_raw.events_follow_up.partition_hour
+    - datalake_salesforce_raw.events_follow_up.partition_hour
     description: Partition hour used for table partitioning (HH).
+  changed_field:
+    description: Array of Salesforce API field names from ChangeEventHeader.changedFields on UPDATE events; NULL or empty on CREATE. Element values keep original Salesforce API names.
+    lineage:
+    - datalake_salesforce_raw.events_follow_up.changed_field

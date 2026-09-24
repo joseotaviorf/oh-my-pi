@@ -1,136 +1,143 @@
----
 database_name: datalake_salesforce_clean
 table_name: events_pendency
 description: >
-  Clean table for ingesting pendency (Solicitação) CDC events from Salesforce into the Data Lake.
-  Each row represents a single change event on a Pendency__c record. Because this is CDC, only
-  the fields that changed in a given event are populated — all other columns will be NULL.
+  Clean table for ingesting pendency (Solicitação) CDC events from Salesforce into the Data
+  Lake.
+  Each row represents a single change event on a Pendency__c record.
+  Because this is CDC, only the fields that changed in a given event are populated — all other
+  columns will be NULL.
   On CREATE events all business fields are populated; on UPDATE events only changed fields.
-  To reconstruct the full current state of a pendency, aggregate events by id_record ordered by id_replay.
+  To reconstruct the full current state of a pendency, aggregate events by id_record ordered
+  by id_replay.
   Pendencies are communications between ENs (Especialistas de Negócio) and CRN partners during
-  the purchase and sale process. They can be created manually or by automation (open_source__c).
+  the purchase and sale process.
+  They can be created manually or by automation (open_source__c).
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com
 columns:
   id_record:
     lineage:
-      - datalake_salesforce_raw.events_pendency.id_record
+    - datalake_salesforce_raw.events_pendency.id_record
     description: Primary Salesforce 18-digit identifier for the pendency request; groups CDC updates for the same partner communication.
   commit_number:
     lineage:
-      - datalake_salesforce_raw.events_pendency.commit_number
+    - datalake_salesforce_raw.events_pendency.commit_number
     description: Commit number associated with the CDC event.
   commit_ts:
     lineage:
-      - datalake_salesforce_raw.events_pendency.commit_ts
+    - datalake_salesforce_raw.events_pendency.commit_ts
     description: Commit timestamp of the CDC event in milliseconds epoch (e.g. 1781014312000). Divide by 1000 to get seconds.
   sequence_number:
     lineage:
-      - datalake_salesforce_raw.events_pendency.sequence_number
+    - datalake_salesforce_raw.events_pendency.sequence_number
     description: Sequence number of the CDC event within the transaction.
   entity_name:
     lineage:
-      - datalake_salesforce_raw.events_pendency.entity_name
+    - datalake_salesforce_raw.events_pendency.entity_name
     description: Salesforce entity name that originated the event (Pendency__c).
   event_type:
     lineage:
-      - datalake_salesforce_raw.events_pendency.event_type
+    - datalake_salesforce_raw.events_pendency.event_type
     description: Type of CDC event. Observed values are CREATE (all fields populated, status='Nova') and UPDATE (only changed fields populated).
   transaction_key:
     lineage:
-      - datalake_salesforce_raw.events_pendency.transaction_key
+    - datalake_salesforce_raw.events_pendency.transaction_key
     description: Unique key identifying the transaction that generated the event.
   commit_user:
     lineage:
-      - datalake_salesforce_raw.events_pendency.commit_user
-    description: Salesforce user ID who committed the change.
+    - datalake_salesforce_raw.events_pendency.commit_user
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   additional_registration__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.AdditionalRegistration__c
+    - datalake_salesforce_raw.events_pendency.AdditionalRegistration__c
     description: Flag indicating if additional registration is required for the pendency.
   assigned_crn__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.AssignedCRN__c
+    - datalake_salesforce_raw.events_pendency.AssignedCRN__c
     description: CRN (notary office) assigned to the pendency (Atribuído ao CRN).
   caso__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.Caso__c
-    description: Salesforce case ID related to the pendency (Caso). Joinable with datalake_salesforce_clean.events_case
+    - datalake_salesforce_raw.events_pendency.Caso__c
+    description: Salesforce Case Id referencing the parent ticket. Join to datalake_salesforce_clean.events_case.id_record.
   comment_response__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.CommentResponse__c
+    - datalake_salesforce_raw.events_pendency.CommentResponse__c
     description: Response to the pendency request written by the CRN partner (Resposta da Solicitação). Contains HTML-formatted rich text, may include embedded images. NULL when this field was not changed in the event.
   comments__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.Comments__c
+    - datalake_salesforce_raw.events_pendency.Comments__c
     description: Original pendency request text written by the EN (Solicitação). Contains HTML-formatted rich text, may include embedded image URLs. NULL when this field was not changed in the event.
   id_created_by:
     lineage:
-      - datalake_salesforce_raw.events_pendency.CreatedById
-    description: Salesforce user ID who created the pendency record (Criado pelo ID). Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_pendency.CreatedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   created_date:
     lineage:
-      - datalake_salesforce_raw.events_pendency.CreatedDate
+    - datalake_salesforce_raw.events_pendency.CreatedDate
     description: Date when the pendency record was created in Salesforce (Data de criação).
   itbi_guide__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.ITBIGuide__c
+    - datalake_salesforce_raw.events_pendency.ITBIGuide__c
     description: Flag indicating if an ITBI guide is associated with the pendency.
   id_last_modified_by:
     lineage:
-      - datalake_salesforce_raw.events_pendency.LastModifiedById
-    description: Salesforce user ID who last modified the pendency record (Última modificação pelo ID). Joinable with datalake_salesforce_clean.users
+    - datalake_salesforce_raw.events_pendency.LastModifiedById
+    description: Salesforce User Id for ownership or audit (Owner / CreatedBy / LastModifiedBy). Join to dw_support_journey.dim_analyst.sk_analyst for analyst dimension attributes (source of truth for SF users).
   last_modified_date:
     lineage:
-      - datalake_salesforce_raw.events_pendency.LastModifiedDate
+    - datalake_salesforce_raw.events_pendency.LastModifiedDate
     description: Date when the pendency record was last modified in Salesforce (Data da última modificação).
   name:
     lineage:
-      - datalake_salesforce_raw.events_pendency.Name
+    - datalake_salesforce_raw.events_pendency.Name
     description: Name/identifier of the pendency record (Pendência).
   offer_id__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.OfferId__c
+    - datalake_salesforce_raw.events_pendency.OfferId__c
     description: Offer ID associated with the pendency (Id Da Offer compatível com dw_sale.dim_sale_agreement.sk_offer).
   open_source__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.OpenSource__c
+    - datalake_salesforce_raw.events_pendency.OpenSource__c
     description: 'Source that opened the pendency (Origem da abertura). Known values: "Manual" (created by an EN), "Automation" (triggered by a Salesforce automation, e.g. automated CCV status update requests).'
   pendency_type__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.PendencyType__c
+    - datalake_salesforce_raw.events_pendency.PendencyType__c
     description: Type/category of the pendency request (Tipo de Solicitação). Known values include "Solicitação de contato (Parceiro ao cliente)". Can be NULL.
   purchase_sale_contract__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.PurchaseSaleContract__c
+    - datalake_salesforce_raw.events_pendency.PurchaseSaleContract__c
     description: Purchase sale contract ID linked to the pendency (Contrato de Compra e Venda). Joinable with datalake_salesforce_clean.purchase_sale_contract
   id_record_type:
     lineage:
-      - datalake_salesforce_raw.events_pendency.RecordTypeId
-    description: Salesforce record type ID for the pendency (ID do tipo de registro).
+    - datalake_salesforce_raw.events_pendency.RecordTypeId
+    description: Salesforce RecordType Id defining the Case (or object) layout and business process. Join to dw_support_journey.dim_record_type.sk_record_type for name, developer_name and sObject metadata.
   id_replay:
     lineage:
-      - datalake_salesforce_raw.events_pendency.ReplayId
+    - datalake_salesforce_raw.events_pendency.ReplayId
     description: Replay ID used for CDC event replay from Salesforce.
   solicitacao_data_de_conclusao__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.Solicitacao_Data_de_Conclusao__c
+    - datalake_salesforce_raw.events_pendency.Solicitacao_Data_de_Conclusao__c
     description: Completion date of the pendency (Solicitação - Data de Conclusão). NULL on CREATE (status='Nova'); populated on UPDATE when status changes to 'Concluída', acting as the effective resolution timestamp.
   status__c:
     lineage:
-      - datalake_salesforce_raw.events_pendency.Status__c
+    - datalake_salesforce_raw.events_pendency.Status__c
     description: 'Current status of the pendency (Status). Known values: "Nova" (initial state on CREATE), "Concluída" (resolved). NULL when this field was not changed in the event.'
   committed_at:
     description: Timestamp of when the CDC event was committed, derived from commit_ts (format YYYY-MM-DD HH:MM:SS, UTC). Equivalent to TIMESTAMP_MILLIS(commit_ts).
   ts_load:
     lineage:
-      - datalake_salesforce_raw.events_pendency.ts_load
+    - datalake_salesforce_raw.events_pendency.ts_load
     description: Timestamp of when the record was loaded into the raw table.
   partition_date:
     lineage:
-      - datalake_salesforce_raw.events_pendency.partition_date
+    - datalake_salesforce_raw.events_pendency.partition_date
     description: Partition date used for table partitioning (YYYY-MM-DD).
   partition_hour:
     lineage:
-      - datalake_salesforce_raw.events_pendency.partition_hour
+    - datalake_salesforce_raw.events_pendency.partition_hour
     description: Partition hour used for table partitioning (HH).
+  changed_field:
+    description: Array of Salesforce API field names from ChangeEventHeader.changedFields on UPDATE events; NULL or empty on CREATE. Element values keep original Salesforce API names.
+    lineage:
+    - datalake_salesforce_raw.events_pendency.changed_field
