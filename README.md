@@ -77,7 +77,7 @@ Almost everything runs **inside Docker**; the host is only there to run containe
 
 ### Credentials (host shell → passed into the container / build)
 
-- **`GITHUB_TOKEN`** — **Required** for the image build and for `uv sync` when private Git dependencies (e.g. `quintoandar-logger`) are resolved. Export it in your **host** shell before `make devcontainer-build` or let your editor pass it when building the devcontainer.
+- **`GITHUB_TOKEN`** — **Required** for the image build and for `uv sync` when private Git dependencies (e.g. `quintoandar-logger`) are resolved. Export it in your **host** shell before `make build-devcontainer` or let your editor pass it when building the devcontainer.
 - **`DATABRICKS_TOKEN`**, **`DATABRICKS_USERNAME`** — Optional on the **host**; the devcontainer forwards them so `make run-local-environment` and Databricks usage behave like on a bare machine.
 
 `make setup-local-variables` can help persist GitHub/Databricks env vars in your host shell if you are not using another secrets manager.
@@ -109,7 +109,7 @@ If you prefer to **pre-build** the image, or you are not using the IDE flow:
 2. Run (BuildKit passes the token as a **secret**, not a build-arg):
 
    ```bash
-   make devcontainer-build
+   make build-devcontainer
    ```
 
 3. In **Cursor** or **VS Code**: **“Dev Containers: Reopen in Container”** to attach to that image, then `make install` inside the container when needed.

@@ -92,7 +92,7 @@ Forno/prod continue to use **`make create-dag-files`** via `.woodpecker/release.
 
 | Area | Behavior |
 |------|----------|
-| **`devcontainer-build`** | Builds the dev image with the BuildKit secret; tags **`bi-etl-ejuice-devcontainer:latest`**. |
+| **`build-devcontainer`** | Builds the dev image with the BuildKit secret; tags **`bi-etl-ejuice-devcontainer:latest`**. |
 | **`build-astro-local-image`** | Builds **`bietlejuice-airflow:local`** from **`astro/Dockerfile`** (repo-root context). |
 | **`build`** | `uv build` for **bietlejuice-core** and **bietlejuice-runtime** to **`dist/`**. |
 | **`install`** | `uv sync` for each project; for runtime uses **`env -u UV_PROJECT_ENVIRONMENT`** in devcontainer-friendly mode; also syncs **`envs/dbr-16-4`** for default test runs. |
