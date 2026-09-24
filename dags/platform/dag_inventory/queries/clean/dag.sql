@@ -2,6 +2,10 @@ SELECT
     dag,
     dag_location,
     cluster_configuration,
+    criticality,
+    sla_deadline_localtime,
+    CAST(freshness_max_staleness_minutes AS INT) AS freshness_max_staleness_minutes,
+    freshness_active_window_localtime,
     year,
     month,
     day

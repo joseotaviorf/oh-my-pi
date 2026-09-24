@@ -139,3 +139,40 @@ def test_enrich_skips_unresolvable_row_on_value_error():
         "criticality": None,
         "sla_deadline_localtime": None,
     }
+
+
+def test_create_dag_dataframe_schema():
+    content = [
+        {
+            "dag": "test_dag",
+            "dag_location": "dags/test.py",
+            "cluster_configuration": "{}",
+            "criticality": "High",
+            "sla_deadline_localtime": "08:00",
+            "freshness_max_staleness_minutes": "60",
+            "freshness_active_window_localtime": "08:00-20:00",
+        }
+    ]
+    execution_date = MagicMock()
+    execution_date.year = 2026
+    execution_date.month = 9
+    execution_date.day = 24
+
+    mock_df = MagicMock()
+    mock_df.withColumn.return_value = mock_df
+
+    with patch.object(_module, "spark", create=True) as mock_spark, patch.object(
+        _module, "SF"
+    ), patch.object(_module, "Row"):
+        mock_spark.createDataFrame.return_value = mock_df
+        df = _module.create_dag_dataframe(content, execution_date)
+
+    expected_schema = (
+        "dag:string, dag_location:string, cluster_configuration:string, "
+        "criticality:string, sla_deadline_localtime:string, "
+        "freshness_max_staleness_minutes:string, freshness_active_window_localtime:string"
+    )
+    mock_spark.createDataFrame.assert_called_once()
+    _, kwargs = mock_spark.createDataFrame.call_args
+    assert kwargs.get("schema") == expected_schema
+    assert df == mock_df

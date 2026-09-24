@@ -26,18 +26,15 @@ scoped AS (
         COALESCE(t.criticality, ds.criticality, 'Medium') AS table_criticality,
         COALESCE(ds.criticality, 'Medium') AS dag_criticality,
         ds.sla_deadline_localtime AS dag_sla_deadline_localtime,
-        pd.freshness_max_staleness_minutes,
-        pd.freshness_active_window_localtime,
-        IF(pd.freshness_max_staleness_minutes IS NOT NULL, 'freshness', 'deadline') AS sla_type
+        ds.freshness_max_staleness_minutes,
+        ds.freshness_active_window_localtime,
+        IF(ds.freshness_max_staleness_minutes IS NOT NULL, 'freshness', 'deadline') AS sla_type
     FROM
-        datalake_pipeline.table AS t
-    JOIN
         datalake_pipeline.dag_sla_information AS ds
-            ON ds.id_dag = t.id_dag
-            AND ds.is_active_and_unpaused = TRUE
-    LEFT JOIN
-        datalake_pipeline.dag AS pd
-            ON pd.id_dag = t.id_dag
+    JOIN
+        datalake_pipeline.table AS t
+            ON t.id_dag = ds.id_dag
+            AND t.dt_last_updated = ds.dt_inventory_snapshot
     -- A table counts from the day after it first appears in the DAG inventory, so a
     -- backfill never scores today's tables on days before they existed.
     JOIN
@@ -47,7 +44,7 @@ scoped AS (
             AND fd.id_task = t.id_task
             AND ds.dt_snapshot > fd.dt_first_declared
     WHERE
-        t.is_active = TRUE
+        ds.is_active_and_unpaused = TRUE
         AND MAKE_DATE(ds.year, ds.month, ds.day)
             BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),

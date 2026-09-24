@@ -14,6 +14,12 @@ from airflow.operators.python_operator import PythonOperator
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.factory_dispatcher import (
     FactoryDispatcher,
 )
+from bietlejuice.base.airflow.enums.criticality_enum import (
+    CRITICALITY_TAG_PREFIX,
+    FRESHNESS_ACTIVE_WINDOW_TAG_PREFIX,
+    FRESHNESS_MAX_STALENESS_TAG_PREFIX,
+    SLA_DEADLINE_TAG_PREFIX,
+)
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -71,6 +77,16 @@ dag_workflow = factory.get_workflow()
 dag = dag_workflow.build_dag()
 
 
+def read_tag_value(dag: DAG, prefix: str) -> str | None:
+    """Reads a value from dag.tags that starts with the given prefix."""
+    if not dag.tags:
+        return None
+    for tag in dag.tags:
+        if tag.startswith(prefix):
+            return tag[len(prefix) :]
+    return None
+
+
 def get_init_cluster_task_name(dag: DAG) -> str:
     """Returns the name of the task that initializes the cluster."""
     for task in dag.task_ids:
@@ -94,6 +110,14 @@ def find_dag_configs(dag_bag: DagBag) -> list:
                 "dag": dag_name,
                 "dag_location": dag.filepath,
                 "cluster_configuration": create_cluster.cluster_configuration,
+                "criticality": read_tag_value(dag, CRITICALITY_TAG_PREFIX),
+                "sla_deadline_localtime": read_tag_value(dag, SLA_DEADLINE_TAG_PREFIX),
+                "freshness_max_staleness_minutes": read_tag_value(
+                    dag, FRESHNESS_MAX_STALENESS_TAG_PREFIX
+                ),
+                "freshness_active_window_localtime": read_tag_value(
+                    dag, FRESHNESS_ACTIVE_WINDOW_TAG_PREFIX
+                ),
             }
         )
     return dag_configs

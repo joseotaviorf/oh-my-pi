@@ -20,10 +20,11 @@ columns:
     description: Surrogate key of the DAG owner line; joins to datalake_pipeline.line.
   criticality:
     lineage:
-      - datalake_pipeline.dag.criticality
+      - datalake_dag_inventory_clean.dag.criticality
     description: >
-      DAG tier carried from datalake_pipeline.dag. Untagged DAGs are Medium.
-      This is the DAG's own tier; a Critical table never raises it.
+      DAG tier from the latest complete DAG inventory snapshot in force for the snapshot date
+      (normally the prior day's inventory). Untagged DAGs are Medium. This is the DAG's own tier;
+      a Critical table never raises it.
     categories:
       Critical: 'Critical tier'
       High: 'High tier'
@@ -31,8 +32,22 @@ columns:
       Low: 'Low tier'
   sla_deadline_localtime:
     lineage:
-      - datalake_pipeline.dag.sla_deadline_localtime
-    description: Declared delivery deadline as São Paulo wall-clock HH:MM; NULL when the DAG declares no deadline.
+      - datalake_dag_inventory_clean.dag.sla_deadline_localtime
+    description: Declared delivery deadline as São Paulo wall-clock HH:MM from the latest complete DAG inventory snapshot in force for the snapshot date; NULL when the DAG declares no deadline.
+  freshness_max_staleness_minutes:
+    lineage:
+      - datalake_dag_inventory_clean.dag.freshness_max_staleness_minutes
+    description: Declared maximum staleness in minutes for intraday freshness tracking from the latest complete DAG inventory snapshot in force for the snapshot date.
+  freshness_active_window_localtime:
+    lineage:
+      - datalake_dag_inventory_clean.dag.freshness_active_window_localtime
+    description: Declared active window in São Paulo wall-clock time for intraday freshness tracking from the latest complete DAG inventory snapshot in force for the snapshot date.
+  dt_inventory_snapshot:
+    lineage:
+      - datalake_dag_inventory_clean.dag.year
+      - datalake_dag_inventory_clean.dag.month
+      - datalake_dag_inventory_clean.dag.day
+    description: Partition date of the DAG inventory snapshot this day was judged against.
   is_active:
     lineage:
       - datalake_pipeline.dag.ts_first_event
@@ -91,7 +106,7 @@ columns:
   is_inside_declared_sla:
     lineage:
       - datalake_pipeline.dag_run.ts_last_table_task_successful_brt
-      - datalake_pipeline.dag.sla_deadline_localtime
+      - datalake_dag_inventory_clean.dag.sla_deadline_localtime
     description: >
       Whether the last table task succeeded by the DAG's declared São Paulo deadline.
       NULL means undecided: no deadline, the DAG is paused, or the deadline has not been reached yet.

@@ -6,6 +6,48 @@ WITH load_dates AS (
     WHERE
         date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+complete_inventories AS (
+    SELECT
+        MAKE_DATE(d.year, d.month, d.day) AS dt_inventory,
+        (COUNT(d.criticality) > 0) AS has_dag_tiers
+    FROM
+        datalake_dag_inventory_clean.dag AS d
+    JOIN (
+        SELECT DISTINCT
+            year,
+            month,
+            day
+        FROM
+            datalake_dag_inventory_clean.table
+    ) AS t
+        ON t.year = d.year
+        AND t.month = d.month
+        AND t.day = d.day
+    GROUP BY
+        1
+),
+seed_inventory AS (
+    SELECT
+        MIN(dt_inventory) AS dt_seed
+    FROM
+        complete_inventories
+    WHERE
+        has_dag_tiers = TRUE
+),
+tier_snapshots AS (
+    SELECT
+        ad.date AS dt_snapshot,
+        MAX(ci.dt_inventory) AS dt_inventory_snapshot
+    FROM
+        load_dates AS ad
+    CROSS JOIN
+        seed_inventory AS si
+    JOIN
+        complete_inventories AS ci
+            ON ci.dt_inventory BETWEEN si.dt_seed AND GREATEST(DATE_SUB(ad.date, 1), si.dt_seed)
+    GROUP BY
+        1
+),
 intraday_dags_ranked AS (
     SELECT
         id_dag,
@@ -127,8 +169,11 @@ dag_base AS (
         d.id_dag,
         d.id_line,
         d.layer,
-        d.criticality,
-        d.sla_deadline_localtime,
+        COALESCE(inv.criticality, 'Medium') AS criticality,
+        inv.sla_deadline_localtime,
+        inv.freshness_max_staleness_minutes,
+        inv.freshness_active_window_localtime,
+        ts.dt_inventory_snapshot,
         d.is_datamart,
         COALESCE(
             ads.is_paused,
@@ -142,6 +187,13 @@ dag_base AS (
             ON dd.id_dag = d.id_dag
     CROSS JOIN
         load_dates AS ad
+    JOIN
+        tier_snapshots AS ts
+            ON ts.dt_snapshot = ad.date
+    LEFT JOIN
+        datalake_dag_inventory_clean.dag AS inv
+            ON inv.dag = d.id_dag
+            AND MAKE_DATE(inv.year, inv.month, inv.day) = ts.dt_inventory_snapshot
     LEFT JOIN
         astro_dag_pause_status AS ads
             ON ads.id_dag = d.id_dag
@@ -230,6 +282,9 @@ base AS (
         d.id_line,
         d.criticality,
         d.sla_deadline_localtime,
+        d.freshness_max_staleness_minutes,
+        d.freshness_active_window_localtime,
+        d.dt_inventory_snapshot,
         TRUE AS is_active,
         CASE
             WHEN d.is_paused = FALSE THEN TRUE
@@ -346,6 +401,9 @@ SELECT
     id_line,
     criticality,
     sla_deadline_localtime,
+    freshness_max_staleness_minutes,
+    freshness_active_window_localtime,
+    dt_inventory_snapshot,
     is_active,
     is_active_and_unpaused,
     is_executed,

@@ -31,6 +31,33 @@ columns:
       and Spark runtime version.
     lineage:
       - datalake_dag_inventory_raw.dag.cluster_configuration
+  criticality:
+    description: |
+      Declared criticality of the DAG extracted from DAG tags. NULL when the DAG has
+      no criticality tag.
+    lineage:
+      - datalake_dag_inventory_raw.dag.criticality
+    categories:
+      Critical: 'Critical tier'
+      High: 'High tier'
+      Medium: 'Medium tier'
+      Low: 'Low tier'
+  sla_deadline_localtime:
+    description: Declared DAG SLA deadline in São Paulo wall-clock time extracted from DAG tags.
+    lineage:
+      - datalake_dag_inventory_raw.dag.sla_deadline_localtime
+  freshness_max_staleness_minutes:
+    description: |
+      Declared maximum staleness in minutes for intraday freshness tracking extracted
+      from DAG tags.
+    lineage:
+      - datalake_dag_inventory_raw.dag.freshness_max_staleness_minutes
+  freshness_active_window_localtime:
+    description: |
+      Declared active window in São Paulo wall-clock time for intraday freshness
+      tracking extracted from DAG tags.
+    lineage:
+      - datalake_dag_inventory_raw.dag.freshness_active_window_localtime
   year:
     description: |
       Ingestion partition year (DAG bag scan date). Filter on year, month, and day

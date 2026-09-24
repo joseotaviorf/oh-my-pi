@@ -3,11 +3,12 @@ table_name: table_sla_information
 owner: jose.rferreira@quintoandar.com
 domain: Data Ops & Governance
 description: >
-  Daily delivery status for every active table of every active, unpaused DAG. Rows are judged
-  on a deadline, or on freshness when the producing DAG declares freshness_max_staleness_minutes;
-  deliveries are successful load task instances plus log success events. A table is scored from the
-  day after it first appears in the DAG inventory. Grain is one row per table, producing DAG, and
-  snapshot date.
+  Daily delivery status for every table declared in the dated inventory snapshot of every active,
+  unpaused DAG. Rows are judged on a deadline, or on freshness when the producing DAG declares freshness_max_staleness_minutes;
+  deliveries are successful load task instances plus log success events. The DAG tier, deadline,
+  freshness settings, and table membership come from the dated DAG inventory snapshot used for
+  that day; a table is scored from the day after it first appears in the inventory. Grain is one
+  row per table, producing DAG, and snapshot date.
 columns:
   id_table:
     lineage:
@@ -120,18 +121,18 @@ columns:
     description: First delivery (successful load task instance or log success event) timestamp in São Paulo time during the delivery cycle.
   sla_type:
     lineage:
-      - datalake_pipeline.dag.freshness_max_staleness_minutes
+      - datalake_pipeline.dag_sla_information.freshness_max_staleness_minutes
     description: Type of SLA scoring applied to the table.
     categories:
       deadline: 'Scored against a daily deadline'
       freshness: 'Scored on maximum staleness across an active window'
   freshness_max_staleness_minutes:
     lineage:
-      - datalake_pipeline.dag.freshness_max_staleness_minutes
+      - datalake_pipeline.dag_sla_information.freshness_max_staleness_minutes
     description: Declared freshness SLA in minutes; NULL for deadline tables.
   freshness_active_window_localtime:
     lineage:
-      - datalake_pipeline.dag.freshness_active_window_localtime
+      - datalake_pipeline.dag_sla_information.freshness_active_window_localtime
     description: São Paulo window in which freshness is scored; NULL for deadline tables.
   deliveries_count:
     lineage:
@@ -145,9 +146,8 @@ columns:
     description: Longest minutes without a delivery in the elapsed active window; NULL for deadline tables and before the window opens.
   dt_snapshot:
     lineage:
-      - datalake_pipeline.dag_sla_information.dt_snapshot
-      - datalake_pipeline.table.dt_last_updated
-    description: Date whose resolved delivery deadline is being evaluated; always after the table first appears in the DAG inventory.
+      - datalake_pipeline.dag_sla_information.dt_inventory_snapshot
+    description: Date whose resolved delivery deadline is being evaluated; tier and SLA settings come from the dated inventory snapshot used for that day.
   ts_load:
     description: Timestamp when enrich_pipeline wrote this SLA snapshot.
   year:

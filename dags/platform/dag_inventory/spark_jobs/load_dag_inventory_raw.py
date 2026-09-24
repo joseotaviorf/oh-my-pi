@@ -301,7 +301,11 @@ Create a string with dag table schema
 
 
 def create_dag_dataframe(content, execution_date):
-    schema = "dag:string, dag_location:string, cluster_configuration:string"
+    schema = (
+        "dag:string, dag_location:string, cluster_configuration:string, "
+        "criticality:string, sla_deadline_localtime:string, "
+        "freshness_max_staleness_minutes:string, freshness_active_window_localtime:string"
+    )
 
     df = spark.createDataFrame(
         (Row(**row_content) for row_content in content), schema=schema
